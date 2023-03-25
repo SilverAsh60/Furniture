@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:final_project_funiture_app/screens/introduce.dart';
 import 'package:flutter/material.dart';
 
 class Welcom extends StatefulWidget {
@@ -11,6 +14,11 @@ class _WelcomState extends State<Welcom> {
   @override
   void initState() {
     super.initState();
+
+    Timer(const Duration(seconds: 3), () {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const Introduce()));
+    });
   }
 
   @override

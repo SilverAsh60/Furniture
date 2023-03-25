@@ -65,7 +65,7 @@ class _LoginState extends State<Login> {
                       filled: true,
                       fillColor: const Color(0xffffdee3),
                       focusColor: const Color(0xffffdee3),
-                      labelText: '  Username  ',
+                      labelText: '  Phone  ',
                       labelStyle: const TextStyle(
                           color: Color(0xff410000), fontSize: 20),
                       floatingLabelStyle: const TextStyle(
@@ -141,6 +141,58 @@ class _LoginState extends State<Login> {
                             width: 0,
                           ))),
                 ),
+              ),
+              Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: const BoxDecoration(
+                              color: Color(0xff410000),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          surfaceTintColor: const Color(0xfff5af19),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.all(18.0),
+                          textStyle: const TextStyle(fontSize: 15,color: Color(0xff410000),fontWeight: FontWeight.normal),
+                        ),
+                        onPressed: () {
+                          setState(() {
+
+                          });
+                        },
+                        child: const Text('               Login               ', style: TextStyle(
+                          fontSize: 20,
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Haven't an account ?" , style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.normal,
+                  ),),
+                  TextButton(
+                  onPressed: () {},
+                  child: const Text("Sign up" , style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.normal,
+                  ),),
+      ),
+                ],
               ),
             ],
           ),

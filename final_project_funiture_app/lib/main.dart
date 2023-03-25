@@ -1,7 +1,9 @@
 //import 'package:final_project_funiture_app/screens/introduce.dart';
+//import 'package:final_project_funiture_app/screens/introduce.dart';
 import 'package:final_project_funiture_app/screens/introduce.dart';
+import 'package:final_project_funiture_app/screens/login.dart';
+import 'package:final_project_funiture_app/screens/welcome.dart';
 //import 'package:final_project_funiture_app/screens/login.dart';
-//import 'package:final_project_funiture_app/screens/welcome.dart';
 import 'package:flutter/material.dart';
 
 void main() {
