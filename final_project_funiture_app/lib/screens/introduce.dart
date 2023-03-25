@@ -13,13 +13,22 @@ class Introduce extends StatefulWidget {
 final List<String> imgList = [
   'assets/images/introduce1.png',
   'assets/images/introduce2.png',
-  'assets/images/introduce2.png',
+  'assets/images/introduce3.png',
+  'assets/images/introduce4.png',
 ];
 
 final List<String> textList = [
   'Easy Shopping Online',
-  'Free Ship EveryWhere',
+  'Free Ship Everywhere',
   'Free installation at home',
+  'Flash Sales Monthly'
+];
+
+final List<String> textDetail = [
+  "With just one phone you can discover all our products easily",
+  "We offer free shipping anywhere in the country on all orders",
+  "We will install the furniture for you completely free of charge",
+  "We will hold many discounts every month",
 ];
 
 class _IntroduceState extends State<Introduce> {
@@ -38,6 +47,7 @@ class _IntroduceState extends State<Introduce> {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
+            centerBackground: true,
             onFinish: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const Home()));
@@ -46,7 +56,7 @@ class _IntroduceState extends State<Introduce> {
               Icons.arrow_forward,
               color: Colors.black,
             ),
-            totalPage: 3,
+            totalPage: 4,
             finishButtonStyle: const FinishButtonStyle(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -62,17 +72,21 @@ class _IntroduceState extends State<Introduce> {
             controllerColor: Colors.white,
             headerBackgroundColor: const Color(0xff410000),
             pageBackgroundColor: const Color(0xff410000),
-            background: const [
+            background: [
               Image(
-                image: AssetImage("assets/images/introduce1.png"),
+                image: AssetImage(imgList[2]),
                 height: 400,
               ),
               Image(
-                image: AssetImage("assets/images/introduce2.png"),
+                image: AssetImage(imgList[0]),
                 height: 400,
               ),
               Image(
-                image: AssetImage("assets/images/introduce1.png"),
+                image: AssetImage(imgList[1]),
+                height: 400,
+              ),
+              Image(
+                image: AssetImage(imgList[3]),
                 height: 400,
               ),
             ],
@@ -95,6 +109,18 @@ class _IntroduceState extends State<Introduce> {
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      textDetail[0],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 17.0,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -121,6 +147,18 @@ class _IntroduceState extends State<Introduce> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      textDetail[1],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -141,6 +179,53 @@ class _IntroduceState extends State<Introduce> {
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      textDetail[2],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 480,
+                    ),
+                    Text(
+                      textList[3],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      textDetail[3],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 17.0,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

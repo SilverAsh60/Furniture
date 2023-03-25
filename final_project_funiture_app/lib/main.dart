@@ -1,9 +1,4 @@
-//import 'package:final_project_funiture_app/screens/introduce.dart';
-//import 'package:final_project_funiture_app/screens/introduce.dart';
-import 'package:final_project_funiture_app/screens/introduce.dart';
-import 'package:final_project_funiture_app/screens/login.dart';
-import 'package:final_project_funiture_app/screens/welcome.dart';
-//import 'package:final_project_funiture_app/screens/login.dart';
+import 'package:final_project_funiture_app/screens/verify.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -19,11 +14,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: const Color(0xff562135),
-        iconTheme: const IconThemeData(color: Colors.black),
+        primaryColor: const Color(0xff410000),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: const Introduce(),
+      home: const Verify(),
     );
   }
 }
