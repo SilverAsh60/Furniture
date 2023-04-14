@@ -77,9 +77,9 @@ class ProductProvider with ChangeNotifier {
       description: productSnapshot["description"].toString(),
       status: productSnapshot["status"].toString(),
       material: Map.from(productSnapshot["material"]),
-      review: double.parse(productSnapshot["rootPrice"].toString()),
-      sellest: double.parse(productSnapshot["rootPrice"].toString()),
-      dateEnter: DateTime.fromMicrosecondsSinceEpoch(productSnapshot["dateEnter"] * 1000),
+      review: double.parse(productSnapshot["review"].toString()),
+      sellest: double.parse(productSnapshot["sellest"].toString()),
+      dateEnter: DateFormat("d/M/y").parse(productSnapshot['dateEnter']),
     );
 
     id = id;

@@ -55,8 +55,6 @@ class _HomePageState extends State<HomePage> {
 
     getCallAllFunction();
 
-    print(productProvider.getListProduct.length.toString());
-
     return Scaffold(
       key: key,
       backgroundColor: const Color(0xfff2f9fe),

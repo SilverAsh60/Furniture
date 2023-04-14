@@ -24,8 +24,6 @@ void getCallAllFunction(String id) {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-
-
   late String imageMainCurrent;
   int i = 0;
   late String activeItem = '';
@@ -45,52 +43,96 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
   }
 
+  setProductItemCurrtent(ProductItem v2) {
+    setState(() {
+      productItem = v2;
+      imageMainCurrent = v2.img[0];
+      activeItem = v2.id;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
+
     productProvider = Provider.of<ProductProvider>(context);
     getCallAllFunction(widget.productID);
 
-    return Scaffold(
-      key: _key,
-      backgroundColor: const Color(0xfff2f9fe),
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
+    setProductItemCurrtent(ProductItem v2) {
+      setState(() {
+        productItem = v2;
+        imageMainCurrent = v2.img[0];
+        activeItem = v2.id;
+      });
+    }
+
+    if (productProvider.getListProductItem.isNotEmpty) {
+
+      if(i==0) {
+        productItem = productProvider.getListProductItem[0];
+        imageMainCurrent = productProvider.getProductCurrent.img;
+        activeItem = productProvider.getListProductItem[0].id;
+        productItem = productProvider.getListProductItem[0];
+      }
+
+      return Scaffold(
+        key: _key,
+        backgroundColor: const Color(0xfff2f9fe),
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          centerTitle: true,
+          iconTheme: const IconThemeData(
+            color: Colors.black,
+          ),
+          title: const AutoSizeText(
+            'Product detail',
+            maxFontSize: 17,
+            minFontSize: 12,
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          actions: [
+            TextButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.shopping_bag_outlined,color: Color(0xff81221e),),
+              label: const Text(''),)
+          ],
         ),
-        title: const AutoSizeText(
-          'Product detail',
-          maxFontSize: 17,
-          minFontSize: 12,
-          style: TextStyle(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+                padding: const EdgeInsets.all(0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    getImage(productProvider.getListProductItem,
+                        productProvider.getProductCurrent),
+                    getInfor(productProvider.getProductCurrent,productItem),
+                  ],
+                )),
+          ),
+        ),
+        bottomNavigationBar: getBottomBar(),
+      );
+    } else {
+      return Scaffold(
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          alignment: Alignment.center,
+          child: const CircularProgressIndicator(
             color: Colors.black,
           ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-              padding: const EdgeInsets.all(0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  getImage(productProvider.getListProductItem,
-                      productProvider.getProductCurrent),
-                  getInfor(productProvider.getProductCurrent),
-                ],
-              )),
-        ),
-      ),
-      bottomNavigationBar: getBottomBar(),
-    );
+      );
+    }
   }
 
   Widget getImage(List<ProductItem> productItemList, Product productCurrent) {
     if (productItemList.isNotEmpty) {
-      ProductItem productItem = productItemList[0];
       if (i == 0) {
         imageMainCurrent = productCurrent.img;
         activeItem = productItemList[0].id;
@@ -177,19 +219,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                           ),
                           GestureDetector(
+                            behavior: HitTestBehavior.deferToChild,
                             onTap: () {
                               setState(() {
-                                productItem = element;
+                                imageMainCurrent = element.img[0];
+                                setProductItemCurrtent(element);
+                                activeItem = element.id;
                               });
                             },
                             child: Container(
                               margin: const EdgeInsets.all(13.5),
                               width: 25,
                               height: 25,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color: HexColor.fromHex(
+                                    getColorFromMap(element.color)),
                                 borderRadius:
-                                  BorderRadius.all(Radius.circular(25)),
+                                    const BorderRadius.all(Radius.circular(25)),
                               ),
                             ),
                           )
@@ -209,45 +255,35 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
   }
 
-  Widget getInfor(Product productCurrent) {
+  Widget getInfor(Product productCurrent, ProductItem productItem) {
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.all(10),
-              child: Text(productCurrent.name,
-                textAlign: TextAlign.justify,
-                style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
-              ),),
-            ),
-          ],
-        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               padding: const EdgeInsets.only(left: 10),
-              child: Text(getDecorPrice(productCurrent.currentPrice),style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),),
+              child: Text(
+                productCurrent.name,
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ],
-        ),
-        Row(
-          children: const [
-            SizedBox(width: 10,),
-            Icon(Icons.star , color: Colors.yellow,),
-            Icon(Icons.star , color: Colors.yellow,),
-            Icon(Icons.star , color: Colors.yellow,),
-            Icon(Icons.star , color: Colors.yellow,),
-            Icon(Icons.star , color: Colors.yellow,),
+            Container(
+              padding: const EdgeInsets.only(right: 10),
+              child: Text(
+                getDecorPrice(productCurrent.currentPrice),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                    color: Color(0xff81221e),
+                ),
+              ),
+            ),
           ],
         ),
         Row(
@@ -255,13 +291,92 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                getNameColorFromMap(productItem.color),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            const SizedBox(
+              width: 10,
+            ),
+            const Icon(
+              Icons.star,
+              color: Colors.grey,
+            ),
+            const Icon(
+              Icons.star,
+              color: Colors.grey,
+            ),
+            const Icon(
+              Icons.star,
+              color: Colors.grey,
+            ),
+            const Icon(
+              Icons.star,
+              color: Colors.grey,
+            ),
+            const Icon(
+              Icons.star,
+              color: Colors.grey,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(
+              "(${productCurrent.review})",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(10),
-              child: const Text('Description',
+              child: Text(
+                "Sells ${productCurrent.sellest.toStringAsFixed(0)}",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Good to know',
                 textAlign: TextAlign.justify,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                ),),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ),
@@ -271,16 +386,114 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(10),
-              child: Text(productCurrent.description,
+              child: Text(
+                productCurrent.description,
                 textAlign: TextAlign.justify,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w400,
-                ),),
+                ),
+              ),
             ),
           ],
-        )
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Measurement',
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: getDataTable(productCurrent.size, "Type" , "Value"),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Material',
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: getDataTable(productCurrent.material, "Type" , "Value"),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              child: const Text(
+                'Review',
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget getDataTable(Map<String, String> size , String text1, text2) {
+    List<DefineSize> listSize = [];
+    size.forEach((key, value) => listSize.add(DefineSize(sizeType: key, sizeValue: value)));
+
+    return DataTable(
+      columns: [
+        DataColumn(label: Text(text1)),
+        DataColumn(label: Text(text2)),
+      ],
+      rows: listSize.map((e) => DataRow(cells: [
+        DataCell(Text(e.sizeType)),
+        DataCell(Text(e.sizeValue)),
+      ])).toList(),
     );
   }
 
@@ -301,6 +514,35 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 }
+class DefineSize {
+  late String sizeType;
+  late String sizeValue;
+
+  DefineSize({
+    required this.sizeType, required this.sizeValue
+});
+}
+
+ProductItem changeValue(ProductItem v1, ProductItem v2) {
+  return v2;
+}
+String getColorFromMap(Map<String, String> color) {
+  var hexColor = "#ffffff";
+  color.forEach((key, value) {
+    hexColor = value;
+  });
+
+  return hexColor;
+}
+
+String getNameColorFromMap(Map<String, String> color) {
+  var hexColor = "Grey";
+  color.forEach((key, value) {
+    hexColor = key;
+  });
+
+  return hexColor;
+}
 
 var bottomNavigationItems = <BottomNavigationBarItem>[
   const BottomNavigationBarItem(
@@ -318,7 +560,12 @@ var bottomNavigationItems = <BottomNavigationBarItem>[
   ),
   const BottomNavigationBarItem(
     backgroundColor: Color(0x00ffffff),
-    icon: Icon(Icons.add_shopping_cart_outlined, color: Colors.black),
+    icon: Icon(Icons.add, color: Colors.black),
     label: "Cart",
+  ),
+  const BottomNavigationBarItem(
+    backgroundColor: Color(0x00ffffff),
+    icon: Icon(Icons.favorite_border_outlined, color: Colors.black),
+    label: "Favorite",
   ),
 ];
