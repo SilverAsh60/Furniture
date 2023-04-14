@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           iconTheme: const IconThemeData(color: Colors.white),
         ),
         debugShowCheckedModeBanner: false,
-        home: const Welcom(),
+        home: const HomePage(),
       ),
     );
   }

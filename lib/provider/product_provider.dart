@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_funiture_app/models/product_model.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 class ProductProvider with ChangeNotifier {
   List<Product> listProduct = [];
   List<ProductItem> listProductItem = [];
-  Product productCurrent = Product(name: '', color: '', img: '', id: '', description: '', size: [], rootPrice: 0, currentPrice: 0, categoryItemId: '', status: '');
+  Product productCurrent = Product(name: '', img: '', id: '', description: '', rootPrice: 0, currentPrice: 0, categoryItemId: '', status: '', material: {}, size: {}, review: 0, sellest: 0, dateEnter: DateTime.now());
   String id ='';
 
   Future<void> getProduct() async {
@@ -17,15 +17,18 @@ class ProductProvider with ChangeNotifier {
     for (var doc in productSnapshot.docs) {
       var product = Product(
         img: doc["img"],
-        color: doc['color'],
         name: doc["name"],
-        id: doc["id"],
-        size: List.from(doc["size"]),
+        id: doc.reference.id,
+        size: Map.from(doc["size"]),
         rootPrice: double.parse(doc["rootPrice"].toString()),
         currentPrice: double.parse(doc["currentPrice"].toString()),
         categoryItemId: doc["categoryItemId"].toString(),
         description: doc["description"].toString(),
         status: doc["status"].toString(),
+        material: Map.from(doc["material"]),
+        review: double.parse(doc["review"].toString()),
+        sellest: double.parse(doc["sellest"].toString()),
+        dateEnter: DateFormat("d/M/y").parse(doc['dateEnter']),
       );
 
       newList.add(product);
@@ -45,8 +48,8 @@ class ProductProvider with ChangeNotifier {
 
     for (var doc in productSnapshotItem.docs) {
       var proItem = ProductItem(
-        id: doc["id"],
-        color: doc['color'],
+        id: doc.reference.id,
+        color: Map.from(doc['color']),
         img: List.from(doc["img"]),
       );
 
@@ -65,15 +68,18 @@ class ProductProvider with ChangeNotifier {
 
     var product = Product(
       img: productSnapshot["img"],
-      color: productSnapshot['color'],
       name: productSnapshot["name"],
-      id: productSnapshot["id"],
-      size: List.from(productSnapshot["size"]),
+      id: productSnapshot.reference.id,
+      size: Map.from(productSnapshot["size"]),
       rootPrice: double.parse(productSnapshot["rootPrice"].toString()),
       currentPrice: double.parse(productSnapshot["currentPrice"].toString()),
       categoryItemId: productSnapshot["categoryItemId"].toString(),
       description: productSnapshot["description"].toString(),
       status: productSnapshot["status"].toString(),
+      material: Map.from(productSnapshot["material"]),
+      review: double.parse(productSnapshot["rootPrice"].toString()),
+      sellest: double.parse(productSnapshot["rootPrice"].toString()),
+      dateEnter: DateTime.fromMicrosecondsSinceEpoch(productSnapshot["dateEnter"] * 1000),
     );
 
     id = id;

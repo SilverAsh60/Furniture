@@ -50,7 +50,7 @@ dependencies:
   fan_carousel_image_slider: ^0.1.2
   firebase_storage: ^11.1.0
   auto_size_text: ^3.0.0
-
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

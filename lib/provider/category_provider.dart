@@ -18,7 +18,7 @@ class CategoryProvider with ChangeNotifier {
       category = Category(
         img: doc["img"].toString(),
         name: doc["name"].toString(),
-        id: doc["id"].toString(),
+        id: doc.reference.id,
         status: doc["status"].toString(),
       );
 

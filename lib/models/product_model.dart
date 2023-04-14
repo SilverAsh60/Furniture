@@ -1,18 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String name;
   final String img;
   final String id;
-  final List<String> size;
+  final Map<String, String> size;
   final double rootPrice;
   final double currentPrice;
   final String status;
   final String categoryItemId;
   final String description;
-  final String color;
+  final Map<String, String> material;
+  final double review;
+  final double sellest;
+  final DateTime dateEnter;
 
   Product({
     required this.name,
-    required this.color,
     required this.img,
     required this.id,
     required this.description,
@@ -21,12 +25,16 @@ class Product {
     required this.currentPrice,
     required this.categoryItemId,
     required this.status,
+    required this.material,
+    required this.review,
+    required this.sellest,
+    required this.dateEnter,
   });
 }
 
 class ProductItem {
   final String id;
-  final String color;
+  final Map<String,String> color;
   final List<String> img;
 
   ProductItem({

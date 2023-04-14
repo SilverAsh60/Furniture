@@ -89,7 +89,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget getImage(List<ProductItem> productItemList, Product productCurrent) {
-    if (productItemList.isNotEmpty && productCurrent.color != '') {
+    if (productItemList.isNotEmpty) {
       ProductItem productItem = productItemList[0];
       if (i == 0) {
         imageMainCurrent = productCurrent.img;
@@ -186,10 +186,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               margin: const EdgeInsets.all(13.5),
                               width: 25,
                               height: 25,
-                              decoration: BoxDecoration(
-                                color: HexColor.fromHex(productCurrent.color),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
                                 borderRadius:
-                                    const BorderRadius.all(Radius.circular(25)),
+                                  BorderRadius.all(Radius.circular(25)),
                               ),
                             ),
                           )

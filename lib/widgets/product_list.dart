@@ -33,15 +33,16 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
             .map(
               (element) => Container(
                 // margin: EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                   gradient: RadialGradient(colors: [
                     Colors.white,
-                    HexColor.fromHex(element.color),
+                    Colors.white,
                   ]),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: Color.fromRGBO(179, 213, 242, 0.2),
                       spreadRadius: 5,
@@ -62,8 +63,8 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                         children: [
                           Image(
                             image: NetworkImage(element.img),
-                            width: 150,
-                            height: 100,
+                            width: 200,
+                            height: 120,
                           ),
                           const SizedBox(
                             height: 5,
@@ -96,12 +97,23 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                         ],
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Container(
+                            margin: const EdgeInsets.only(left: 5),
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Color(0xff81221e),
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: const Text('New' , style: TextStyle(color: Colors.white),),
+                          ),
                           IconButton(
                             icon: const Icon(
                               Icons.favorite_border_outlined,
-                              color: Colors.white,
+                              color: Colors.red,
                             ),
                             onPressed: () {},
                           ),
@@ -120,8 +132,10 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
 String getDecorPrice(double price) {
   String priceDecor = "";
   String test = price.toString();
-  
-  if(test[test.indexOf('.') + 1] == '0') {
+  String temp = "";
+
+  if(test.contains('.') == true) {
+    temp = test.substring(test.indexOf('.'),test.length);
     test = test.substring(0, test.indexOf('.'));
 
     int number = 0;
@@ -137,5 +151,25 @@ String getDecorPrice(double price) {
     }
   }
 
-  return priceDecor.split('').reversed.join('');
+  else {
+    int number = 0;
+    for(int i=test.length-1 ; i >= 0 ; i--) {
+      number++;
+      if(number == 3) {
+        priceDecor = '$priceDecor${test[i]},';
+        number = 0;
+      }
+      else {
+        priceDecor = '$priceDecor${test[i]}';
+      }
+    }
+  }
+
+  priceDecor = priceDecor.split('').reversed.join('');
+  if(priceDecor.indexOf(',') == 0) {
+    priceDecor = priceDecor.substring(1,priceDecor.length);
+  }
+
+  priceDecor = "\$ $priceDecor$temp";
+  return priceDecor;
 }

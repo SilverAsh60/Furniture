@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
 
     getCallAllFunction();
 
-    //print(productProvider.getListProduct.length.toString());
+    print(productProvider.getListProduct.length.toString());
 
     return Scaffold(
       key: key,
@@ -102,51 +102,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   getProductList(productProvider.getListProduct, context),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        left: 10, bottom: 10, top: 20, right: 10),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "Best Seller",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "SecularOne Regular",),
-                    ),
-                  ),
-                  getProductList(productProvider.getListProduct,context),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        left: 10, bottom: 10, top: 20, right: 10),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "Featured Collections",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "SecularOne Regular",),
-                    ),
-                  ),
-                  getProductList(productProvider.getListProduct,context),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        left: 10, bottom: 10, top: 20, right: 10),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "Hot Decorations",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "SecularOne Regular",),
-                    ),
-                  ),
-                  getProductList(productProvider.getListProduct,context),
                 ],
               )
             ]),
