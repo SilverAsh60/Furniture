@@ -87,7 +87,7 @@ void itemClick(int selectedItem, BuildContext context) {
   } else if (selectedItem == 3) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const NotificationPage()));
-  } else if (selectedItem == 1) {
+  } else if (selectedItem == 4) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const FavoritePage()));
   }

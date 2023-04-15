@@ -1,10 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:final_project_funiture_app/widgets/bottom_navy_bar.dart';
+import 'package:final_project_funiture_app/screens/cart.dart';
 import 'package:final_project_funiture_app/widgets/product_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/cart_model.dart';
 import '../models/product_model.dart';
 import '../provider/product_provider.dart';
+import '../services/DatabaseHandler.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({super.key, required this.productID});
@@ -24,15 +27,21 @@ void getCallAllFunction(String id) {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  late DatabaseHandler handler;
+  late Cart cart;
+
   late String imageMainCurrent;
-  int i = 0;
-  late String activeItem = '';
+  late String activeItem;
   late ProductItem productItem;
+  late Product productCurrent;
+  late int number = 0;
 
   @override
   void initState() {
-    getCallAllFunction(widget.productID);
     super.initState();
+    number = 0;
+    getCallAllFunction(widget.productID);
+    handler = DatabaseHandler();
   }
 
   bool setActiveColor(String itemID) {
@@ -43,7 +52,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
   }
 
-  setProductItemCurrtent(ProductItem v2) {
+  setProductItemCurrent(ProductItem v2) {
     setState(() {
       productItem = v2;
       imageMainCurrent = v2.img[0];
@@ -51,6 +60,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
   }
 
+  AssetImage placeImage = const AssetImage("assets/images/logo.png");
+
+  setCart(Cart v2) {
+    setState(() {
+      cart = v2;
+    });
+  }
+
+  int cartBadgeAmount = 0;
+  late bool showCartBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -58,25 +77,36 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     productProvider = Provider.of<ProductProvider>(context);
     getCallAllFunction(widget.productID);
 
-    setProductItemCurrtent(ProductItem v2) {
-      setState(() {
-        productItem = v2;
-        imageMainCurrent = v2.img[0];
-        activeItem = v2.id;
-      });
-    }
-
     if (productProvider.getListProductItem.isNotEmpty) {
-
-      if(i==0) {
+      //activeItem = productProvider.getListProductItem[0].id;
+      //productItem = productProvider.getListProductItem[0];
+      //imageMainCurrent = productProvider.getProductCurrent.img;
+      if (number == 0) {
         productItem = productProvider.getListProductItem[0];
         imageMainCurrent = productProvider.getProductCurrent.img;
         activeItem = productProvider.getListProductItem[0].id;
         productItem = productProvider.getListProductItem[0];
+        cart = Cart(
+            quantity: 1,
+            idProduct: productItem.id,
+            price: productProvider.getProductCurrent.currentPrice,
+            imgProduct: productProvider.getProductCurrent.img,
+            nameProduct: productProvider.getProductCurrent.name,
+            color: getNameColorFromMap(productItem.color));
+        setState(() {
+
+        });
       }
 
+      setState(() {
+        int cartAmount = handler.getListCart.length;
+        cartBadgeAmount = cartAmount;
+      });
+
+      bool showCartBadge = cartBadgeAmount > 0;
+
+
       return Scaffold(
-        key: _key,
         backgroundColor: const Color(0xfff2f9fe),
         appBar: AppBar(
           automaticallyImplyLeading: true,
@@ -94,11 +124,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           backgroundColor: Colors.transparent,
           elevation: 0.0,
+
+
           actions: [
-            TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.shopping_bag_outlined,color: Color(0xff81221e),),
-              label: const Text(''),)
+        badges.Badge(
+        position: badges.BadgePosition.topEnd(top: 10, end: 5),
+        showBadge: showCartBadge,
+        badgeContent: Text(cartBadgeAmount.toString(),style: const TextStyle(color: Colors.white),),
+        child: IconButton(
+            icon: const Icon(
+              Icons.shopping_bag_outlined,
+              color: Color(0xff80221e),
+            ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+            }),
+      ),
           ],
         ),
         body: SafeArea(
@@ -110,7 +151,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: [
                     getImage(productProvider.getListProductItem,
                         productProvider.getProductCurrent),
-                    getInfor(productProvider.getProductCurrent,productItem),
+                    getInfor(productProvider.getProductCurrent, productItem),
                   ],
                 )),
           ),
@@ -133,11 +174,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Widget getImage(List<ProductItem> productItemList, Product productCurrent) {
     if (productItemList.isNotEmpty) {
-      if (i == 0) {
+      if (number == 0) {
         imageMainCurrent = productCurrent.img;
         activeItem = productItemList[0].id;
         productItem = productItemList[0];
-        i++;
+        number ++;
       }
       return Column(
         mainAxisSize: MainAxisSize.max,
@@ -167,10 +208,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             width: 100,
                             height: 100,
                             margin: const EdgeInsets.only(bottom: 10),
-                            child: Image(
+                            /*child: FadeInImage(
                               image: NetworkImage(productItem.img[index]),
-                              fit: BoxFit.fill,
-                            ),
+                              fit: BoxFit.fill, placeholder: placeImage,
+                            ),*/
+
+                            child: Image(image: placeImage,fit: BoxFit.fill,),
+
                           ));
                     }),
               ),
@@ -181,11 +225,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 width: MediaQuery.of(context).size.width -
                     MediaQuery.of(context).size.width / 4,
                 height: 300,
-                child: Image(
+                /*child: FadeInImage(
                   image: NetworkImage(imageMainCurrent),
                   fit: BoxFit.fill,
-                  key: ValueKey(DateTime.now().toString()),
-                ),
+                  placeholder: placeImage,
+                ),*/
+                child: Image(image: placeImage,fit: BoxFit.fill,),
               ),
             ],
           ),
@@ -223,7 +268,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             onTap: () {
                               setState(() {
                                 imageMainCurrent = element.img[0];
-                                setProductItemCurrtent(element);
+                                setProductItemCurrent(element);
+                                setCart(Cart(
+                                    quantity: 1,
+                                    idProduct: element.id,
+                                    price: productCurrent.currentPrice,
+                                    imgProduct: '',
+                                    nameProduct: '',
+                                    color: ''));
                                 activeItem = element.id;
                               });
                             },
@@ -280,7 +332,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                    color: Color(0xff81221e),
+                  color: Color(0xff81221e),
                 ),
               ),
             ),
@@ -423,7 +475,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(10),
-              child: getDataTable(productCurrent.size, "Type" , "Value"),
+              child: getDataTable(productCurrent.size, "Type", "Value"),
             ),
           ],
         ),
@@ -453,7 +505,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(10),
-              child: getDataTable(productCurrent.material, "Type" , "Value"),
+              child: getDataTable(productCurrent.material, "Type", "Value"),
             ),
           ],
         ),
@@ -481,19 +533,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget getDataTable(Map<String, String> size , String text1, text2) {
+  Widget getDataTable(Map<String, String> size, String text1, text2) {
     List<DefineSize> listSize = [];
-    size.forEach((key, value) => listSize.add(DefineSize(sizeType: key, sizeValue: value)));
+    size.forEach((key, value) =>
+        listSize.add(DefineSize(sizeType: key, sizeValue: value)));
 
     return DataTable(
       columns: [
         DataColumn(label: Text(text1)),
         DataColumn(label: Text(text2)),
       ],
-      rows: listSize.map((e) => DataRow(cells: [
-        DataCell(Text(e.sizeType)),
-        DataCell(Text(e.sizeValue)),
-      ])).toList(),
+      rows: listSize
+          .map((e) => DataRow(cells: [
+                DataCell(Text(e.sizeType)),
+                DataCell(Text(e.sizeValue)),
+              ]))
+          .toList(),
     );
   }
 
@@ -510,22 +565,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       ),
       backgroundColor: const Color(0x00ffffff),
       items: bottomNavigationItems,
-      onTap: (selectedItem) => itemClick(selectedItem, context),
+      onTap: (selectedItem) => itemClick(selectedItem, handler),
     );
   }
+
+  Future<void> itemClick(int selectedItem, DatabaseHandler handler) async {
+    if (selectedItem == 0) {
+    } else if (selectedItem == 1) {
+    } else if (selectedItem == 2) {
+      await handler.insertCart(cart);
+      handler.retrieveCarts();
+    } else if (selectedItem == 3) {}
+  }
 }
+
 class DefineSize {
   late String sizeType;
   late String sizeValue;
 
-  DefineSize({
-    required this.sizeType, required this.sizeValue
-});
+  DefineSize({required this.sizeType, required this.sizeValue});
 }
 
 ProductItem changeValue(ProductItem v1, ProductItem v2) {
   return v2;
 }
+
 String getColorFromMap(Map<String, String> color) {
   var hexColor = "#ffffff";
   color.forEach((key, value) {

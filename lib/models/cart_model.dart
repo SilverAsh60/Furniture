@@ -1,17 +1,33 @@
 class Cart {
   final String idProduct;
   final String nameProduct;
-  final String idCart;
-  final String dateEnter;
-  final int quantity;
+  final String imgProduct;
   final String color;
+  final int? idCart;
+  final int quantity;
+  final double price;
 
   Cart({
-    required this.idCart,
+    this.idCart,
+    required this.imgProduct,
     required this.nameProduct,
-    required this.dateEnter,
-    required this.quantity,
     required this.color,
+    required this.quantity,
     required this.idProduct,
+    required this.price,
   });
+
+  Cart.fromMap(Map<String, dynamic> cart)
+      : idCart = cart["idCart"],
+        quantity = cart["quantity"],
+        idProduct = cart["idProduct"],
+        color = cart["color"],
+        nameProduct = cart["nameProduct"],
+        imgProduct = cart["imgProduct"],
+        price = cart["price"];
+
+  Map<String, Object?> toMap() {
+    return {'idCart':idCart,'quantity': quantity, 'color':color,'idProduct': idProduct, 'nameProduct':nameProduct , 'imgProduct':imgProduct, 'price': price};
+  }
+
 }

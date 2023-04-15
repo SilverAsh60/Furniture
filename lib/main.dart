@@ -1,6 +1,7 @@
 import 'package:final_project_funiture_app/provider/banner_provider.dart';
 import 'package:final_project_funiture_app/provider/category_provider.dart';
 import 'package:final_project_funiture_app/provider/product_provider.dart';
+import 'package:final_project_funiture_app/screens/cart.dart';
 import 'package:final_project_funiture_app/screens/home.dart';
 import 'package:final_project_funiture_app/screens/login.dart';
 import 'package:final_project_funiture_app/screens/product_detail.dart';
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
           iconTheme: const IconThemeData(color: Colors.white),
         ),
         debugShowCheckedModeBanner: false,
-        home: const HomePage(),
+        home: const HomePage(  ),
       ),
     );
   }

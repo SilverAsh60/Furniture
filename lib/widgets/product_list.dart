@@ -1,5 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:final_project_funiture_app/models/favorite_model.dart';
 import 'package:final_project_funiture_app/screens/product_detail.dart';
+import 'package:final_project_funiture_app/services/FavoriteDatabaseHandle.dart';
 import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 
@@ -21,6 +23,10 @@ extension HexColor on Color {
 }
 
 Widget getProductList(List<Product> produceList, BuildContext context) {
+  AssetImage placeImage = const AssetImage("assets/images/logo.png");
+
+  FavoriteDatabaseHandler favoriteDatabaseHandler = FavoriteDatabaseHandler();
+
   return Container(
     margin: const EdgeInsets.all(10),
     height: 220,
@@ -61,11 +67,12 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image(
+                          /*FadeInImage(
                             image: NetworkImage(element.img),
                             width: 200,
-                            height: 120,
-                          ),
+                            height: 120, placeholder: placeImage,
+                          ),*/
+                          const Image(image: AssetImage("assets/images/logo.png") , width: 200,height: 120,),
                           const SizedBox(
                             height: 5,
                           ),
@@ -115,7 +122,15 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                               Icons.favorite_border_outlined,
                               color: Colors.red,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              var favorite = Favorite(
+                                  imgProduct: element.img,
+                                  nameProduct: element.name,
+                                  idProduct: element.id,
+                                  price: element.currentPrice,);
+
+                              favoriteDatabaseHandler.insertFavorite(favorite);
+                            },
                           ),
                         ],
                       )

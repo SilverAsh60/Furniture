@@ -2,6 +2,8 @@
 import 'package:final_project_funiture_app/provider/banner_provider.dart';
 import 'package:final_project_funiture_app/provider/category_provider.dart';
 import 'package:final_project_funiture_app/provider/product_provider.dart';
+import 'package:final_project_funiture_app/screens/cart.dart';
+import 'package:final_project_funiture_app/services/FavoriteDatabaseHandle.dart';
 import 'package:final_project_funiture_app/widgets/banner.dart';
 import 'package:final_project_funiture_app/widgets/bottom_navy_bar.dart';
 import 'package:final_project_funiture_app/widgets/product_list.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
+import '../services/DatabaseHandler.dart';
 import '../widgets/category_list.dart';
 import '../widgets/search.dart';
 
@@ -24,6 +27,11 @@ CategoryProvider categoryProvider = CategoryProvider();
 ProductProvider productProvider = ProductProvider();
 
 class _HomePageState extends State<HomePage> {
+
+  late DatabaseHandler handler;
+  late FavoriteDatabaseHandler favoriteDatabaseHandler;
+
+
   int cartBadgeAmount = 0;
   int favoriteBadgeAmount = 0;
   late bool showCartBadge;
@@ -40,8 +48,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    getCallAllFunction();
     super.initState();
+    handler = DatabaseHandler();
+    favoriteDatabaseHandler = FavoriteDatabaseHandler();
+    getCallAllFunction();
   }
 
   @override
@@ -54,6 +64,15 @@ class _HomePageState extends State<HomePage> {
     width = MediaQuery.of(context).size.width;
 
     getCallAllFunction();
+
+    setState(() {
+      int cartAmount = handler.getListCart.length;
+      int favoriteAmount = favoriteDatabaseHandler.getListFavorite.length;
+      cartBadgeAmount = cartAmount;
+      favoriteBadgeAmount = favoriteAmount;
+
+      favoriteDatabaseHandler.retrieveFavorites();
+    });
 
     return Scaffold(
       key: key,
@@ -108,6 +127,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: getFooter(0, context),
     );
+
   }
 }
 
@@ -115,6 +135,7 @@ Widget header(BuildContext context, int cartBadgeAmount,
     int favoriteBadgeAmount, double height, width) {
   bool showCartBadge = cartBadgeAmount > 0;
   bool showFavoriteBadge = favoriteBadgeAmount > 0;
+
   return Container(
     padding: const EdgeInsets.all(10),
     child: Row(
@@ -161,7 +182,7 @@ Widget header(BuildContext context, int cartBadgeAmount,
           ],
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+
           children: [
             badges.Badge(
               showBadge: showFavoriteBadge,
@@ -174,14 +195,17 @@ Widget header(BuildContext context, int cartBadgeAmount,
                   onPressed: () {}),
             ),
             badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 10, end: 5),
               showBadge: showCartBadge,
-              badgeContent: Text(cartBadgeAmount.toString()),
+              badgeContent: Text(cartBadgeAmount.toString(),style: const TextStyle(color: Colors.white),),
               child: IconButton(
                   icon: const Icon(
                     Icons.shopping_bag_outlined,
                     color: Color(0xff80221e),
                   ),
-                  onPressed: () {}),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+                  }),
             ),
           ],
         )

@@ -2,6 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 Widget getCategoryList(List<Category> categoryList) {
+
+  AssetImage placeImage = const AssetImage("assets/images/logo.png");
   return Container(
     margin: const EdgeInsets.all(10),
     height: 140,
@@ -37,7 +39,8 @@ Widget getCategoryList(List<Category> categoryList) {
                       ),
                     ],
                   ),
-                  child: Image(image: NetworkImage(element.img),fit: BoxFit.fill),
+                  //child: Image(image: NetworkImage(element.img),fit: BoxFit.fill),
+                  child: Image(image: placeImage,fit: BoxFit.fill),
                 ),
                 Container(
                   alignment: Alignment.center,

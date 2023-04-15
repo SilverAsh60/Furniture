@@ -13,9 +13,14 @@ class BannerWidget extends StatefulWidget {
 class _BannerWidgetState extends State<BannerWidget> {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final List<String> listBanner = [];
+  final List<String> listBanner = [
+    "assets/images/logo.png",
+    "assets/images/logo.png",
+    "assets/images/logo.png",
+    "assets/images/logo.png",
+  ];
 
-  getBanner() async {
+  /*getBanner() async {
     return await firestore.collection("banner").get().then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         setState(() {
@@ -23,11 +28,11 @@ class _BannerWidgetState extends State<BannerWidget> {
         });
       }
     });
-  }
+  }*/
 
   @override
   void initState() {
-    getBanner();
+    //getBanner();
     super.initState();
   }
 
@@ -38,7 +43,7 @@ class _BannerWidgetState extends State<BannerWidget> {
         padding: const EdgeInsets.only(top: 10),
         child: FanCarouselImageSlider(
           imagesLink: listBanner,
-          isAssets: false,
+          isAssets: true,
           sliderHeight: 244,
           sliderWidth: 430,
           sidesOpacity: 0.3,
