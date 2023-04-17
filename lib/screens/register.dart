@@ -53,7 +53,6 @@ class _RegisterState extends State<Register> {
       });
       result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email.text, password: password.text);
-      print(result);
       FirebaseFirestore.instance.collection("User").doc(result.user!.uid).set({
         "UserName": userName.text,
         "UserId": result.user!.uid,
@@ -162,9 +161,9 @@ class _RegisterState extends State<Register> {
         padding: const EdgeInsets.all(0),
         decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/background_register.jpg"),
-              fit: BoxFit.fill,
-            )),
+          image: AssetImage("assets/images/background_register.jpg"),
+          fit: BoxFit.fill,
+        )),
         child: SafeArea(
           child: GlassmorphicContainer(
             width: MediaQuery.of(context).size.width,
@@ -205,10 +204,10 @@ class _RegisterState extends State<Register> {
                             alignment: Alignment.topLeft,
                             decoration: const BoxDecoration(
                                 image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/background_register.jpg"),
-                                  fit: BoxFit.cover,
-                                )),
+                              image: AssetImage(
+                                  "assets/images/background_register.jpg"),
+                              fit: BoxFit.cover,
+                            )),
                             padding: const EdgeInsets.only(left: 70, right: 70),
                             height: 200,
                           ),
@@ -282,7 +281,7 @@ class _RegisterState extends State<Register> {
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         labelText: 'Email',
                         labelStyle:
-                        TextStyle(color: Color(0xff410000), fontSize: 20),
+                            TextStyle(color: Color(0xff410000), fontSize: 20),
                         prefixIcon: Icon(
                           Icons.account_circle,
                           color: Color(0xff7c0019),
@@ -338,7 +337,7 @@ class _RegisterState extends State<Register> {
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         labelText: 'Username',
                         labelStyle:
-                        TextStyle(color: Color(0xff410000), fontSize: 20),
+                            TextStyle(color: Color(0xff410000), fontSize: 20),
                         prefixIcon: Icon(
                           Icons.account_circle,
                           color: Color(0xff7c0019),
@@ -394,7 +393,7 @@ class _RegisterState extends State<Register> {
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         labelText: 'Phone number',
                         labelStyle:
-                        TextStyle(color: Color(0xff410000), fontSize: 20),
+                            TextStyle(color: Color(0xff410000), fontSize: 20),
                         prefixIcon: Icon(
                           Icons.account_circle,
                           color: Color(0xff7c0019),
@@ -450,7 +449,7 @@ class _RegisterState extends State<Register> {
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         labelText: 'Password',
                         labelStyle:
-                        TextStyle(color: Color(0xff410000), fontSize: 20),
+                            TextStyle(color: Color(0xff410000), fontSize: 20),
                         prefixIcon: Icon(
                           Icons.account_circle,
                           color: Color(0xff7c0019),
@@ -506,7 +505,7 @@ class _RegisterState extends State<Register> {
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         labelText: 'Address',
                         labelStyle:
-                        TextStyle(color: Color(0xff410000), fontSize: 20),
+                            TextStyle(color: Color(0xff410000), fontSize: 20),
                         prefixIcon: Icon(
                           Icons.account_circle,
                           color: Color(0xff7c0019),
