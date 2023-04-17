@@ -1,6 +1,9 @@
+import 'package:final_project_funiture_app/screens/search.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project_funiture_app/provider/product_provider.dart';
 
-Widget searchField(double width) {
+Widget searchField(
+    double width, TextEditingController searchQuery, BuildContext context) {
   return Row(
     children: [
       Expanded(
@@ -45,14 +48,46 @@ Widget searchField(double width) {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Search ....",
-                          style: TextStyle(
+                      children: [
+                        // Text(
+                        //   "Search ....",
+                        //   style: TextStyle(
+                        //       fontSize: 15,
+                        //       color: Colors.grey,
+                        //       fontWeight: FontWeight.bold),
+                        // ),
+                        TextField(
+                          cursorColor: const Color(0xff410000),
+                          style: const TextStyle(
+                              // letterSpacing: 1,
                               fontSize: 15,
                               color: Colors.grey,
                               fontWeight: FontWeight.bold),
-                        ),
+                          controller: searchQuery,
+                          onSubmitted: (value) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        Search(query: value)));
+
+                            // ProductProvider productProvider = ProductProvider();
+                            // productProvider.searchProductsByName(value);
+                          },
+                          // keyboardType: TextInputType.phone,
+                          // decoration: const InputDecoration(
+                          //   floatingLabelBehavior: FloatingLabelBehavior.auto,
+                          //   labelText: 'Search query',
+                          //   labelStyle: TextStyle(
+                          //       color: Color(0xff410000), fontSize: 20),
+                          //   prefixIcon: Icon(
+                          //     Icons.account_circle,
+                          //     color: Color(0xff7c0019),
+                          //     size: 30,
+                          //   ),
+                          //   border: InputBorder.none,
+                          // ),
+                        )
                       ]),
                 ),
               ),

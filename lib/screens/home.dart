@@ -1,4 +1,3 @@
-
 import 'package:final_project_funiture_app/provider/banner_provider.dart';
 import 'package:final_project_funiture_app/provider/category_provider.dart';
 import 'package:final_project_funiture_app/provider/product_provider.dart';
@@ -27,10 +26,9 @@ CategoryProvider categoryProvider = CategoryProvider();
 ProductProvider productProvider = ProductProvider();
 
 class _HomePageState extends State<HomePage> {
-
   late DatabaseHandler handler;
   late FavoriteDatabaseHandler favoriteDatabaseHandler;
-
+  final TextEditingController searchQuery = TextEditingController();
 
   int cartBadgeAmount = 0;
   int favoriteBadgeAmount = 0;
@@ -87,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   header(context, cartBadgeAmount, favoriteBadgeAmount, height,
                       width),
-                  searchField(width),
+                  searchField(width, searchQuery, context),
                   const BannerWidget(),
                   Container(
                     padding: const EdgeInsets.only(
@@ -112,12 +110,14 @@ class _HomePageState extends State<HomePage> {
                       "New Archive",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "SecularOne Regular",),
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "SecularOne Regular",
+                      ),
                     ),
                   ),
+                  getProductList(productProvider.searchProducts, context),
                   getProductList(productProvider.getListProduct, context),
                 ],
               )
@@ -127,7 +127,6 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: getFooter(0, context),
     );
-
   }
 }
 
@@ -182,7 +181,6 @@ Widget header(BuildContext context, int cartBadgeAmount,
           ],
         ),
         Row(
-
           children: [
             badges.Badge(
               showBadge: showFavoriteBadge,
@@ -197,14 +195,20 @@ Widget header(BuildContext context, int cartBadgeAmount,
             badges.Badge(
               position: badges.BadgePosition.topEnd(top: 10, end: 5),
               showBadge: showCartBadge,
-              badgeContent: Text(cartBadgeAmount.toString(),style: const TextStyle(color: Colors.white),),
+              badgeContent: Text(
+                cartBadgeAmount.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
               child: IconButton(
                   icon: const Icon(
                     Icons.shopping_bag_outlined,
                     color: Color(0xff80221e),
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartPage()));
                   }),
             ),
           ],

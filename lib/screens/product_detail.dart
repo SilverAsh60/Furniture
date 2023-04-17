@@ -73,7 +73,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-
     productProvider = Provider.of<ProductProvider>(context);
     getCallAllFunction(widget.productID);
 
@@ -93,9 +92,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             imgProduct: productProvider.getProductCurrent.img,
             nameProduct: productProvider.getProductCurrent.name,
             color: getNameColorFromMap(productItem.color));
-        setState(() {
-
-        });
+        setState(() {});
       }
 
       setState(() {
@@ -104,7 +101,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       });
 
       bool showCartBadge = cartBadgeAmount > 0;
-
 
       return Scaffold(
         backgroundColor: const Color(0xfff2f9fe),
@@ -124,22 +120,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           backgroundColor: Colors.transparent,
           elevation: 0.0,
-
-
           actions: [
-        badges.Badge(
-        position: badges.BadgePosition.topEnd(top: 10, end: 5),
-        showBadge: showCartBadge,
-        badgeContent: Text(cartBadgeAmount.toString(),style: const TextStyle(color: Colors.white),),
-        child: IconButton(
-            icon: const Icon(
-              Icons.shopping_bag_outlined,
-              color: Color(0xff80221e),
+            badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 10, end: 5),
+              showBadge: showCartBadge,
+              badgeContent: Text(
+                cartBadgeAmount.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              child: IconButton(
+                  icon: const Icon(
+                    Icons.shopping_bag_outlined,
+                    color: Color(0xff80221e),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartPage()));
+                  }),
             ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
-            }),
-      ),
           ],
         ),
         body: SafeArea(
@@ -178,7 +178,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         imageMainCurrent = productCurrent.img;
         activeItem = productItemList[0].id;
         productItem = productItemList[0];
-        number ++;
+        number++;
       }
       return Column(
         mainAxisSize: MainAxisSize.max,
@@ -213,8 +213,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               fit: BoxFit.fill, placeholder: placeImage,
                             ),*/
 
-                            child: Image(image: placeImage,fit: BoxFit.fill,),
-
+                            child: Image(
+                              image: placeImage,
+                              fit: BoxFit.fill,
+                            ),
                           ));
                     }),
               ),
@@ -230,7 +232,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   fit: BoxFit.fill,
                   placeholder: placeImage,
                 ),*/
-                child: Image(image: placeImage,fit: BoxFit.fill,),
+                child: Image(
+                  image: placeImage,
+                  fit: BoxFit.fill,
+                ),
               ),
             ],
           ),

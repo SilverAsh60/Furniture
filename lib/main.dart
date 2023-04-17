@@ -7,6 +7,7 @@ import 'package:final_project_funiture_app/screens/login.dart';
 import 'package:final_project_funiture_app/screens/product_detail.dart';
 import 'package:final_project_funiture_app/screens/register.dart';
 import 'package:final_project_funiture_app/screens/welcome.dart';
+import 'package:final_project_funiture_app/screens/search.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
           iconTheme: const IconThemeData(color: Colors.white),
         ),
         debugShowCheckedModeBanner: false,
-        home: const HomePage(  ),
+        home: const HomePage(),
       ),
     );
   }
