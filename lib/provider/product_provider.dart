@@ -2,11 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_funiture_app/models/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProductProvider with ChangeNotifier {
   List<Product> listProduct = [];
   List<Product> searchProducts = [];
   List<ProductItem> listProductItem = [];
+  String url = '';
+
   Product productCurrent = Product(
       name: '',
       img: '',
@@ -135,6 +140,26 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _uploadImage(
+      {required File image, required String userUid}) async {
+    String url;
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("UserImage/$userUid");
+    UploadTask uploadTask = storageReference.putFile(image);
+
+    uploadTask.whenComplete(() async {
+      print('whenComplete');
+      url = await storageReference.getDownloadURL();
+    }).catchError((onError) {
+      print(onError);
+      print('Error');
+    });
+  }
+
+  String get getUrl {
+    return url;
+  }
+
   List<Product> get getSearchProduct {
     return searchProducts;
   }
@@ -152,5 +177,19 @@ class ProductProvider with ChangeNotifier {
   List<ProductItem> get getListProductItem {
     //getProductItem(id);
     return listProductItem;
+  }
+
+  List<String> notificationList = [];
+
+  void addNotification(String notification) {
+    notificationList.add(notification);
+  }
+
+  int get getNotificationIndex {
+    return notificationList.length;
+  }
+
+  get getNotificationList {
+    return notificationList;
   }
 }

@@ -53,6 +53,7 @@ dependencies:
   intl: ^0.17.0
   sqflite: ^2.2.6
   path: ^1.8.2
+  image_picker: ^0.8.7+3
 
 dev_dependencies:
   flutter_test:
