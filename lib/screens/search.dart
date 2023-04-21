@@ -106,7 +106,28 @@ class _SearchState extends State<Search> {
               Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  header(context),
+                  // header(context),
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(
+                            left: 10, bottom: 10, top: 20, right: 10),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "Search result",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "SecularOne Regular",
+                          ),
+                        ),
+                      ),
+                      // getProductList(productProvider.getListProduct, context),
+                    ],
+                  ),
                   Row(
                     children: [
                       Expanded(

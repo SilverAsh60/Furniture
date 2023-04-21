@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:final_project_funiture_app/screens/introduce.dart';
 import 'package:flutter/material.dart';
 
-class Welcom extends StatefulWidget {
-  const Welcom({super.key});
+class Welcome extends StatefulWidget {
+  const Welcome({super.key});
 
   @override
-  State<Welcom> createState() => _WelcomState();
+  State<Welcome> createState() => _WelcomeState();
 }
 
-class _WelcomState extends State<Welcom> {
+class _WelcomeState extends State<Welcome> {
   @override
   void initState() {
     super.initState();

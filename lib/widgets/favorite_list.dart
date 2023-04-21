@@ -22,7 +22,7 @@ extension HexColor on Color {
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
 
-Widget getProductList(List<Product> produceList, BuildContext context) {
+Widget getFavoriteList(List<Favorite> produceList, BuildContext context) {
   AssetImage placeImage = const AssetImage("assets/images/logo.png");
 
   FavoriteDatabaseHandler favoriteDatabaseHandler = FavoriteDatabaseHandler();
@@ -61,7 +61,7 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            ProductDetailPage(productID: element.id)));
+                            ProductDetailPage(productID: element.idProduct)));
                   },
                   child: Stack(
                     children: [
@@ -83,7 +83,7 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                             height: 5,
                           ),
                           AutoSizeText(
-                            element.name,
+                            element.nameProduct,
                             maxFontSize: 15,
                             minFontSize: 12,
                             textAlign: TextAlign.center,
@@ -97,7 +97,7 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                             height: 2,
                           ),
                           AutoSizeText(
-                            getDecorPrice(element.currentPrice),
+                            getDecorPrice(element.price),
                             maxFontSize: 15,
                             minFontSize: 12,
                             textAlign: TextAlign.left,
@@ -112,35 +112,29 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            margin: const EdgeInsets.only(left: 5),
-                            width: 40,
-                            height: 40,
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: Color(0xff81221e),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                            ),
-                            child: const Text(
-                              'New',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
+                          // Container(
+                          //   margin: const EdgeInsets.only(left: 5),
+                          //   width: 40,
+                          //   height: 40,
+                          //   alignment: Alignment.center,
+                          //   decoration: const BoxDecoration(
+                          //     color: Color(0xff81221e),
+                          //     borderRadius:
+                          //         BorderRadius.all(Radius.circular(20)),
+                          //   ),
+                          //   child: const Text(
+                          //     'New',
+                          //     style: TextStyle(color: Colors.white),
+                          //   ),
+                          // ),
                           IconButton(
                             icon: const Icon(
-                              Icons.favorite_border_outlined,
+                              Icons.close,
                               color: Colors.red,
                             ),
                             onPressed: () {
-                              var favorite = Favorite(
-                                imgProduct: element.img,
-                                nameProduct: element.name,
-                                idProduct: element.id,
-                                price: element.currentPrice,
-                              );
-
-                              favoriteDatabaseHandler.insertFavorite(favorite);
+                              favoriteDatabaseHandler
+                                  .deleteFavorite(element.idFavorite);
                             },
                           ),
                         ],
