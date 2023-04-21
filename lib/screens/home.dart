@@ -117,7 +117,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  getProductList(productProvider.searchProducts, context),
                   getProductList(productProvider.getListProduct, context),
                 ],
               )

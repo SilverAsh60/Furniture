@@ -60,6 +60,7 @@ class _RegisterState extends State<Register> {
         "UserAddress": address.text,
         "UserGender": isMale == true ? "Male" : "Female",
         "UserNumber": phoneNumber.text,
+        "UserImage": "",
       });
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (ctx) => Login()));

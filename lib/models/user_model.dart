@@ -1,21 +1,17 @@
-class User {
-  final String phone;
-  final String fullname;
-  final String address;
-  final String img;
-  final String birthDate;
-  final String codeCustomer;
-  final double allBill;
-  final String dateEnter;
+import 'package:flutter/material.dart';
 
-  User({
-    required this.phone,
-    required this.fullname,
-    required this.address,
-    required this.img,
-    required this.birthDate,
-    required this.codeCustomer,
-    required this.allBill,
-    required this.dateEnter,
-  });
+class UserModel {
+  late String userName,
+      userEmail,
+      userGender,
+      userPhoneNumber,
+      userImage,
+      userAddress;
+  UserModel(
+      {required this.userEmail,
+      required this.userImage,
+      required this.userAddress,
+      required this.userGender,
+      required this.userName,
+      required this.userPhoneNumber});
 }
