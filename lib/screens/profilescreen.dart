@@ -280,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       key: _scaffoldKey,
-      backgroundColor: Color(0xfff8f8f8),
+      backgroundColor: const Color(0xfff2f9fe),
       appBar: AppBar(
         leading: edit == true
             ? IconButton(

@@ -3,7 +3,6 @@ import 'package:path/path.dart';
 
 import '../models/favorite_model.dart';
 
-
 class FavoriteDatabaseHandler {
   Future<Database> initializeDB() async {
     String path = await getDatabasesPath();
@@ -31,10 +30,9 @@ class FavoriteDatabaseHandler {
     final List<Map<String, Object?>> queryResult = await db.query('Favorite');
     listFavorite = queryResult.map((e) => Favorite.fromMap(e)).toList();
     return queryResult.map((e) => Favorite.fromMap(e)).toList();
-
   }
 
-  Future<void> deleteFavorite(int idFavorite) async {
+  Future<void> deleteFavorite(int? idFavorite) async {
     final db = await initializeDB();
     await db.delete(
       'Favorite',
