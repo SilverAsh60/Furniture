@@ -3,6 +3,7 @@ import 'package:final_project_funiture_app/screens/home.dart';
 import 'package:final_project_funiture_app/screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Introduce extends StatefulWidget {
   const Introduce({super.key});
@@ -35,6 +36,17 @@ final List<String> textDetail = [
 class _IntroduceState extends State<Introduce> {
   int currentIndex = 0;
   CarouselController carouselController = CarouselController();
+
+  @override
+  void initState() {
+    storePref();
+    super.initState();
+  }
+
+  Future<void> storePref() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('SHOW_INTRODUCT_PAGE', true);
+  }
 
   @override
   Widget build(BuildContext context) {

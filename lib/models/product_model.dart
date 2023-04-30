@@ -13,9 +13,10 @@ class Product {
   final Map<String, String> material;
   final double review;
   final double sellest;
-  final DateTime dateEnter;
+  final String title;
 
   Product({
+    required this.title,
     required this.name,
     required this.img,
     required this.id,
@@ -28,7 +29,6 @@ class Product {
     required this.material,
     required this.review,
     required this.sellest,
-    required this.dateEnter,
   });
 }
 

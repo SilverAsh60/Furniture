@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:final_project_funiture_app/models/favorite_model.dart';
 import 'package:final_project_funiture_app/screens/product_detail.dart';
-import 'package:final_project_funiture_app/services/FavoriteDatabaseHandle.dart';
+import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
 import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 
@@ -23,9 +23,8 @@ extension HexColor on Color {
 }
 
 Widget getProductList(List<Product> produceList, BuildContext context) {
-  AssetImage placeImage = const AssetImage("assets/images/logo.png");
 
-  FavoriteDatabaseHandler favoriteDatabaseHandler = FavoriteDatabaseHandler();
+  DatabaseHandler handler = DatabaseHandler();
 
   return Container(
     margin: const EdgeInsets.all(10),
@@ -128,10 +127,7 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(
-                              Icons.favorite_border_outlined,
-                              color: Colors.red,
-                            ),
+                            icon: getIconFavorite(element.id, handler.getListFavorite),
                             onPressed: () {
                               var favorite = Favorite(
                                 imgProduct: element.img,
@@ -140,7 +136,7 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
                                 price: element.currentPrice,
                               );
 
-                              favoriteDatabaseHandler.insertFavorite(favorite);
+                              handler.insertFavorite(favorite);
                             },
                           ),
                         ],
@@ -156,6 +152,25 @@ Widget getProductList(List<Product> produceList, BuildContext context) {
   );
 }
 
+<<<<<<< Updated upstream
+=======
+Widget getIconFavorite(String idProduct , List<Favorite> favorite) {
+
+  bool check = false;
+  for (var element in favorite) {
+    if(element.idProduct == idProduct) {
+      check = true;
+    }
+  }
+
+  if(check) {
+    return const Icon(Icons.favorite_border_rounded , color: Colors.red,);
+  } else {
+    return const Icon(Icons.favorite_border_outlined , color: Colors.red);
+  }
+}
+
+>>>>>>> Stashed changes
 String getDecorPrice(double price) {
   String priceDecor = "";
   String test = price.toString();

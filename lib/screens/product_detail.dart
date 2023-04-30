@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:final_project_funiture_app/screens/cart.dart';
-import 'package:final_project_funiture_app/widgets/product_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/cart_model.dart';
@@ -30,7 +29,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   late DatabaseHandler handler;
   late Cart cart;
 
-  late String imageMainCurrent;
+  late String imageMainCurrent = "assets/images/logo.png";
   late String activeItem;
   late ProductItem productItem;
   late Product productCurrent;
@@ -60,8 +59,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
   }
 
-  AssetImage placeImage = const AssetImage("assets/images/logo.png");
-
   setCart(Cart v2) {
     setState(() {
       cart = v2;
@@ -73,6 +70,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+
     productProvider = Provider.of<ProductProvider>(context);
     getCallAllFunction(widget.productID);
 
@@ -92,7 +90,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             imgProduct: productProvider.getProductCurrent.img,
             nameProduct: productProvider.getProductCurrent.name,
             color: getNameColorFromMap(productItem.color));
-        setState(() {});
+        setState(() {
+
+        });
       }
 
       setState(() {
@@ -101,6 +101,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       });
 
       bool showCartBadge = cartBadgeAmount > 0;
+
 
       return Scaffold(
         backgroundColor: const Color(0xfff2f9fe),
@@ -120,26 +121,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           backgroundColor: Colors.transparent,
           elevation: 0.0,
+
+
           actions: [
-            badges.Badge(
-              position: badges.BadgePosition.topEnd(top: 10, end: 5),
-              showBadge: showCartBadge,
-              badgeContent: Text(
-                cartBadgeAmount.toString(),
-                style: const TextStyle(color: Colors.white),
-              ),
-              child: IconButton(
-                  icon: const Icon(
-                    Icons.shopping_bag_outlined,
-                    color: Color(0xff80221e),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartPage()));
-                  }),
+        badges.Badge(
+        position: badges.BadgePosition.topEnd(top: 10, end: 5),
+        showBadge: showCartBadge,
+        badgeContent: Text(cartBadgeAmount.toString(),style: const TextStyle(color: Colors.white),),
+        child: IconButton(
+            icon: const Icon(
+              Icons.shopping_bag_outlined,
+              color: Color(0xff80221e),
             ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+            }),
+      ),
           ],
         ),
         body: SafeArea(
@@ -178,7 +175,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         imageMainCurrent = productCurrent.img;
         activeItem = productItemList[0].id;
         productItem = productItemList[0];
-        number++;
+        number ++;
       }
       return Column(
         mainAxisSize: MainAxisSize.max,
@@ -213,10 +210,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               fit: BoxFit.fill, placeholder: placeImage,
                             ),*/
 
-                            child: Image(
-                              image: placeImage,
-                              fit: BoxFit.fill,
-                            ),
+                            child: Image(image: AssetImage(productItem.img[index]),fit: BoxFit.fill,),
+
                           ));
                     }),
               ),
@@ -232,10 +227,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   fit: BoxFit.fill,
                   placeholder: placeImage,
                 ),*/
-                child: Image(
-                  image: placeImage,
-                  fit: BoxFit.fill,
-                ),
+                child: Image(image: AssetImage(imageMainCurrent),fit: BoxFit.fill,),
               ),
             ],
           ),
@@ -278,9 +270,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     quantity: 1,
                                     idProduct: element.id,
                                     price: productCurrent.currentPrice,
-                                    imgProduct: '',
-                                    nameProduct: '',
-                                    color: ''));
+                                    imgProduct: productCurrent.img,
+                                    nameProduct: productCurrent.name,
+                                    color: getNameColorFromMap(element.color)));
                                 activeItem = element.id;
                               });
                             },
@@ -584,11 +576,69 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 }
 
+extension HexColor on Color {
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+}
+
 class DefineSize {
   late String sizeType;
   late String sizeValue;
 
   DefineSize({required this.sizeType, required this.sizeValue});
+}
+
+String getDecorPrice(double price) {
+  String priceDecor = "";
+  String test = price.toString();
+  String temp = "";
+
+  if (test.contains('.') == true) {
+    temp = test.substring(test.indexOf('.'), test.length);
+    test = test.substring(0, test.indexOf('.'));
+
+    int number = 0;
+    for (int i = test.length - 1; i >= 0; i--) {
+      number++;
+      if (number == 3) {
+        priceDecor = '$priceDecor${test[i]},';
+        number = 0;
+      } else {
+        priceDecor = '$priceDecor${test[i]}';
+      }
+    }
+  } else {
+    int number = 0;
+    for (int i = test.length - 1; i >= 0; i--) {
+      number++;
+      if (number == 3) {
+        priceDecor = '$priceDecor${test[i]},';
+        number = 0;
+      } else {
+        priceDecor = '$priceDecor${test[i]}';
+      }
+    }
+  }
+
+  priceDecor = priceDecor.split('').reversed.join('');
+  if (priceDecor.indexOf(',') == 0) {
+    priceDecor = priceDecor.substring(1, priceDecor.length);
+  }
+
+  priceDecor = "\$ $priceDecor$temp";
+  return priceDecor;
 }
 
 ProductItem changeValue(ProductItem v1, ProductItem v2) {

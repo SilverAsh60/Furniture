@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_funiture_app/screens/login.dart';
+import 'package:final_project_funiture_app/screens/verify.dart';
+import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/phone_model.dart';
+import '../models/user_model.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
 class Register extends StatefulWidget {
@@ -13,146 +18,653 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 String p =
     r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
 
 RegExp regExp = RegExp(p);
+RegExp digitExp = RegExp(r'^[0-9]+$');
+RegExp textExp = RegExp(r'^[a-zA-Z_\s\\p{L}]+$');
 bool obSerText = true;
-final TextEditingController email = TextEditingController();
+
 final TextEditingController userName = TextEditingController();
 final TextEditingController phoneNumber = TextEditingController();
 final TextEditingController password = TextEditingController();
-final TextEditingController address = TextEditingController();
+final TextEditingController confirmPassword = TextEditingController();
 
 bool isMale = true;
 bool isLoading = false;
+bool isRegisterSuccessfull = false;
+bool isWarning = false;
+bool isError = false;
+
+String messageError = "";
+String messageWarning = "";
 
 class _RegisterState extends State<Register> {
-  // final TextEditingController nameController = TextEditingController();
-  // final TextEditingController phoneController = TextEditingController();
-  // final TextEditingController passwordController = TextEditingController();
-  // final TextEditingController comfirmPasswordController =
-  //     TextEditingController();
 
-  // final name = "";
-  // final phone = "";
-  // final password = "";
-  // final comfirmPassword = "";
+  bool validateFullName = true;
+  bool validatePhone = true;
+  bool validatePassword = true;
+  bool validateConfirmPass = true;
 
-  // bool passwordVisible_1 = true;
-  // bool passwordVisible_2 = true;
+  late DatabaseHandler handler;
 
-  void submit() async {
-    print('submit');
+
+  void submit(BuildContext context) async {
     UserCredential result;
+
     try {
       setState(() {
         isLoading = true;
+        isRegisterSuccessfull = false;
+        isWarning = false;
+        isError = false;
+        if (isLoading) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        // The loading indicator
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        // Some text
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context);
+          });
+        }
+        else if (isRegisterSuccessfull) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
+                        // Some text
+                        Text('Register Successfully'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
+            prefs.setBool('LOGIN', true);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Verify(phoneUser:  phone)));
+          });
+        }
+        else if (isWarning) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
+                        // Some text
+                        Text(messageWarning),
+                        ElevatedButton(onPressed: () {
+                          isWarning = false;
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else if (isError) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                        // Some text
+                        Text(messageError),
+                        ElevatedButton(onPressed: () {
+                          setState(() {
+                            isError = false;
+                            isLoading = false;
+                          });
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else {
+          Navigator.pop(context);
+        }
       });
       result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text, password: password.text);
-      FirebaseFirestore.instance.collection("User").doc(result.user!.uid).set({
-        "UserName": userName.text,
-        "UserId": result.user!.uid,
-        "UserEmail": email.text,
-        "UserAddress": address.text,
-        "UserGender": isMale == true ? "Male" : "Female",
-        "UserNumber": phoneNumber.text,
-        "UserImage": "",
-      });
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (ctx) => Login()));
+          email: "${phoneNumber.text}@gmail.com", password: password.text);
+
+      //print(result);
+      UserSQ newUser = UserSQ(
+          email: "",
+          phone: currentPhoneNumber.value + phoneNumber.text,
+          fullName: userName.text,
+          address: "",
+          status: "INVALID",
+          img: "",
+          birthDate: "",
+          idUser: result.user!.uid,
+          dateEnter: DateTime.now().toString());
+
+      await FirebaseFirestore.instance.collection("user")
+          .doc(result.user!.uid)
+          .set(newUser.toMap());
+
       setState(() {
         isLoading = false;
+        isRegisterSuccessfull = true;
+        isWarning = false;
+        isError = false;
+
+        if (isLoading) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        // The loading indicator
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        // Some text
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context);
+          });
+        }
+        else if (isRegisterSuccessfull) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
+                        // Some text
+                        Text('Register Successfully'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
+            prefs.setBool('LOGIN', true);
+            handler.insertUser(newUser);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Verify(phoneUser:  phone)));
+          });
+        }
+        else if (isWarning) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
+                        // Some text
+                        Text(messageWarning),
+                        ElevatedButton(onPressed: () {
+                          isWarning = false;
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else if (isError) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                        // Some text
+                        Text(messageError),
+                        ElevatedButton(onPressed: () {
+                          setState(() {
+                            isError = false;
+                            isLoading = false;
+                          });
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else {
+          Navigator.pop(context);
+        }
       });
     } on PlatformException catch (error) {
       var message = "Please Check Your Internet Connection ";
       if (error.message != null) {
-        message = error.message ?? '';
+        //print(error.message ?? '');
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(message.toString()),
-        duration: const Duration(milliseconds: 600),
-        backgroundColor: Theme.of(context).primaryColor,
-      ));
       setState(() {
         isLoading = false;
+        isRegisterSuccessfull = false;
+        isWarning = true;
+        isError = false;
+
+        messageWarning = message;
+
+        if (isLoading) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        // The loading indicator
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        // Some text
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context);
+          });
+        }
+        else if (isRegisterSuccessfull) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
+                        // Some text
+                        Text('Register Successfully'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Verify(phoneUser:  phone)));
+          });
+        }
+        else if (isWarning) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
+                        // Some text
+                        Text(messageWarning),
+                        ElevatedButton(onPressed: () {
+                          isWarning = false;
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else if (isError) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                        // Some text
+                        Text(messageError),
+                        ElevatedButton(onPressed: () {
+                          setState(() {
+                            isError = false;
+                            isLoading = false;
+                          });
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else {
+          Navigator.pop(context);
+        }
       });
     } catch (error) {
       setState(() {
         isLoading = false;
+        isRegisterSuccessfull = false;
+        isWarning = false;
+        isError = true;
+
+        messageError = error.toString();
+
+        if (isLoading) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        // The loading indicator
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        // Some text
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            Navigator.pop(context);
+          });
+        }
+        else if (isRegisterSuccessfull) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
+                        // Some text
+                        Text('Register Successfully'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+
+          Timer(const Duration(milliseconds: 1000), () {
+            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Verify(phoneUser:  phone)));
+          });
+        }
+        else if (isWarning) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
+                        // Some text
+                        Text(messageWarning),
+                        ElevatedButton(onPressed: () {
+                          isWarning = false;
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else if (isError) {
+          showDialog(
+            // The user CANNOT close this dialog  by pressing outsite it
+              context: context,
+              builder: (_) {
+                return Dialog(
+                  // The background color
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                        // Some text
+                        Text(messageError),
+                        ElevatedButton(onPressed: () {
+                          setState(() {
+                            isError = false;
+                            isLoading = false;
+                          });
+                          Navigator.pop(context);
+                        }, child: const Text('OK')),
+                      ],
+                    ),
+                  ),
+                );
+              }
+          );
+        }
+        else {
+          Navigator.pop(context);
+        }
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(error.toString()),
-        duration: Duration(milliseconds: 600),
-        backgroundColor: Theme.of(context).primaryColor,
-      ));
-      print(error);
     }
   }
 
-  void vaildation() async {
+
+  void validation(BuildContext context) async {
     if (userName.text.isEmpty &&
-        email.text.isEmpty &&
-        password.text.isEmpty &&
         phoneNumber.text.isEmpty &&
-        address.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("All Flied Are Empty"),
-        ),
-      );
-    } else if (userName.text.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Name Must Be 6 "),
-        ),
-      );
-    } else if (email.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Email Is Empty"),
-        ),
-      );
-    } else if (!regExp.hasMatch(email.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please Try Vaild Email"),
-        ),
-      );
-    } else if (password.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Password Is Empty"),
-        ),
-      );
-    } else if (password.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Password  Is Too Short"),
-        ),
-      );
-    } else if (phoneNumber.text.length < 11 || phoneNumber.text.length > 11) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Phone Number Must Be 11 "),
-        ),
-      );
-    } else if (address.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Adress Is Empty "),
-        ),
-      );
-    } else {
-      submit();
+        password.text.isEmpty &&
+        phoneNumber.text.isEmpty) {
+
+      setState(() {
+        validatePhone = false;
+        validateFullName = false;
+        validatePassword = false;
+        validateConfirmPass = false;
+      });
     }
+
+    if(validateConfirmPass) {
+      if (validatePassword) {
+        if (validateFullName) {
+          if(validatePhone) {
+
+            submit(context);
+          }
+        }
+      }
+    }
+  }
+
+  bool checkPhoneUnique = true;
+  bool checkPhone = true;
+
+  PhoneNumber currentPhoneNumber = listPhoneNumber[0];
+  String phoneInput = listPhoneNumber[0].value + listPhoneNumber[0].format;
+
+  late final SharedPreferences prefs;
+
+  @override
+  void initState() {
+    getPrefs();
+    super.initState();
+    handler = DatabaseHandler();
+  }
+
+  Future<void> getPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   @override
   Widget build(BuildContext context) {
+    List<String> errorMessage = [
+      "Full name is only character and not empty",
+      "Phone is only ${currentPhoneNumber.digit} number and not empty",
+      'Password must least 8 digit and not empty',
+      'Confirm Password must equal to Password and not empty',
+      'Phone is exist',
+    ];
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
@@ -188,694 +700,529 @@ class _RegisterState extends State<Register> {
               Colors.white,
               Colors.white,
             ]),
-            child: Container(
-              padding: const EdgeInsets.all(0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(0),
-                    child: Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        ClipPath(
-                          clipper: WaveShape(),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            alignment: Alignment.topLeft,
-                            decoration: const BoxDecoration(
-                                image: DecorationImage(
-                              image: AssetImage(
-                                  "assets/images/background_register.jpg"),
-                              fit: BoxFit.cover,
-                            )),
-                            padding: const EdgeInsets.only(left: 70, right: 70),
-                            height: 200,
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(0),
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          ClipPath(
+                            clipper: WaveShape(),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              alignment: Alignment.topLeft,
+                              decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/background_register.jpg"),
+                                    fit: BoxFit.cover,
+                                  )),
+                              padding: const EdgeInsets.only(left: 70, right: 70),
+                              height: 200,
+                            ),
                           ),
-                        ),
-                        Column(mainAxisSize: MainAxisSize.max, children: [
-                          const Text(
-                            "Sign up",
-                            style: TextStyle(
-                                color: Color(0xff410000),
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.all(10),
-                            child: const Text(
-                              "Create your new account",
+                          Column(mainAxisSize: MainAxisSize.max, children: [
+                            const Text(
+                              "Sign up",
                               style: TextStyle(
-                                color: Color(0xff410000),
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
+                                  color: Color(0xff410000),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.all(10),
+                              child: const Text(
+                                "Create your new account",
+                                style: TextStyle(
+                                  color: Color(0xff410000),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            )
+                          ]),
+                        ],
+                      ),
+                    ),
+
+                    // Full name
+                    GlassmorphicContainer(
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
+                      height: 60,
+                      margin: const EdgeInsets.only(
+                          bottom: 10, top: 0, left: 20, right: 20),
+                      borderRadius: 50,
+                      linearGradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            0.8,
+                            1
+                          ]),
+                      border: 0,
+                      blur: 0,
+                      borderGradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            1
+                          ]),
+                      child: TextField(
+                        onChanged: (text) {
+                          if(text.isEmpty || textExp.hasMatch(text)) {
+                            setState(() {
+                              validateFullName = true;
+                            });
+                          }
+                          else {
+                            setState(() {
+                              validateFullName = false;
+                            });
+                          }
+                        },
+                        cursorColor: const Color(0xff410000),
+                        style: const TextStyle(
+                          letterSpacing: 1,
+                          fontSize: 20,
+                          color: Color(0xff410000),
+                        ),
+                        controller: userName,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                          hintText: 'Full Name',
+                          prefixIcon: Icon(
+                            Icons.account_circle,
+                            color: Color(0xff7c0019),
+                            size: 30,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: !validateFullName,
+                      child: Column(
+                        children: [
+                          Text(
+                            errorMessage[0],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 5,),
+                        ],
+                      ),
+                    ),
+                    // Phone Number
+                    GlassmorphicContainer(
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
+                      height: 60,
+                      margin: const EdgeInsets.only(
+                          bottom: 10, top: 0, left: 20, right: 20),
+                      borderRadius: 50,
+                      linearGradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            0.8,
+                            1
+                          ]),
+                      border: 0,
+                      blur: 0,
+                      borderGradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            1
+                          ]),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width/6,
+                            margin: const EdgeInsets.only(left: 20),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<PhoneNumber>(
+                                menuMaxHeight:
+                                MediaQuery.of(context).size.height / 2,
+                                isExpanded: true,
+                                borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                                dropdownColor: const Color(0xfff2f9fe),
+                                value: currentPhoneNumber,
+                                items: listPhoneNumber.map((e) {
+                                  return DropdownMenuItem<PhoneNumber>(
+                                    value: e,
+                                    child: Text(e.value , style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Color(0xff410000),
+                                    ),),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    currentPhoneNumber = value!;
+                                  });
+                                },
                               ),
                             ),
-                          )
-                        ]),
-                      ],
-                    ),
-                  ),
-                  GlassmorphicContainer(
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    height: 60,
-                    margin: const EdgeInsets.only(
-                        bottom: 10, top: 0, left: 20, right: 20),
-                    borderRadius: 50,
-                    linearGradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
-                          Colors.white.withOpacity(0.2),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              onChanged: (text) {
+                                if((text.isEmpty || digitExp.hasMatch(text)) && text.length == currentPhoneNumber.digit) {
+                                  setState(() {
+                                    validatePhone = true;
+                                  });
+                                }
+                                else {
+                                  setState(() {
+                                    validatePhone = false;
+                                  });
+                                }
+                              },
+                              cursorColor: const Color(0xff410000),
+                              style: const TextStyle(
+                                letterSpacing: 1,
+                                fontSize: 20,
+                                color: Color(0xff410000),
+                              ),
+                              controller: phoneNumber,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: currentPhoneNumber.format,
+                                prefixIcon: const Icon(
+                                  Icons.phone_android,
+                                  color: Color(0xff7c0019),
+                                  size: 30,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ],
-                        stops: const [
-                          0.5,
-                          0.8,
-                          1
-                        ]),
-                    border: 0,
-                    blur: 0,
-                    borderGradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          1
-                        ]),
-                    child: TextField(
-                      cursorColor: const Color(0xff410000),
-                      style: const TextStyle(
-                        letterSpacing: 1,
-                        fontSize: 20,
-                        color: Color(0xff410000),
-                      ),
-                      controller: email,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: 'Email',
-                        labelStyle:
-                            TextStyle(color: Color(0xff410000), fontSize: 20),
-                        prefixIcon: Icon(
-                          Icons.account_circle,
-                          color: Color(0xff7c0019),
-                          size: 30,
-                        ),
-                        border: InputBorder.none,
                       ),
                     ),
-                  ),
-                  GlassmorphicContainer(
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    height: 60,
-                    margin: const EdgeInsets.only(
-                        bottom: 10, top: 0, left: 20, right: 20),
-                    borderRadius: 50,
-                    linearGradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
-                          Colors.white.withOpacity(0.2),
+                    Visibility(
+                      visible: !validatePhone,
+                      child: Column(
+                        children: [
+                          Text(
+                            errorMessage[1],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 5,),
                         ],
-                        stops: const [
-                          0.5,
-                          0.8,
-                          1
-                        ]),
-                    border: 0,
-                    blur: 0,
-                    borderGradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          1
-                        ]),
-                    child: TextField(
-                      cursorColor: const Color(0xff410000),
-                      style: const TextStyle(
-                        letterSpacing: 1,
-                        fontSize: 20,
-                        color: Color(0xff410000),
-                      ),
-                      controller: userName,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: 'Username',
-                        labelStyle:
-                            TextStyle(color: Color(0xff410000), fontSize: 20),
-                        prefixIcon: Icon(
-                          Icons.account_circle,
-                          color: Color(0xff7c0019),
-                          size: 30,
-                        ),
-                        border: InputBorder.none,
                       ),
                     ),
-                  ),
-                  GlassmorphicContainer(
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    height: 60,
-                    margin: const EdgeInsets.only(
-                        bottom: 10, top: 0, left: 20, right: 20),
-                    borderRadius: 50,
-                    linearGradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
-                          Colors.white.withOpacity(0.2),
+                    Visibility(
+                      visible: !checkPhoneUnique,
+                      child: Column(
+                        children: [
+                          Text(
+                            errorMessage[4],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 5,),
                         ],
-                        stops: const [
-                          0.5,
-                          0.8,
-                          1
-                        ]),
-                    border: 0,
-                    blur: 0,
-                    borderGradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          1
-                        ]),
-                    child: TextField(
-                      cursorColor: const Color(0xff410000),
-                      style: const TextStyle(
-                        letterSpacing: 1,
-                        fontSize: 20,
-                        color: Color(0xff410000),
-                      ),
-                      controller: phoneNumber,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: 'Phone number',
-                        labelStyle:
-                            TextStyle(color: Color(0xff410000), fontSize: 20),
-                        prefixIcon: Icon(
-                          Icons.account_circle,
-                          color: Color(0xff7c0019),
-                          size: 30,
-                        ),
-                        border: InputBorder.none,
                       ),
                     ),
-                  ),
-                  GlassmorphicContainer(
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    height: 60,
-                    margin: const EdgeInsets.only(
-                        bottom: 10, top: 0, left: 20, right: 20),
-                    borderRadius: 50,
-                    linearGradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          0.8,
-                          1
-                        ]),
-                    border: 0,
-                    blur: 0,
-                    borderGradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          1
-                        ]),
-                    child: TextField(
-                      cursorColor: const Color(0xff410000),
-                      style: const TextStyle(
-                        letterSpacing: 1,
-                        fontSize: 20,
-                        color: Color(0xff410000),
-                      ),
-                      controller: password,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: 'Password',
-                        labelStyle:
-                            TextStyle(color: Color(0xff410000), fontSize: 20),
-                        prefixIcon: Icon(
-                          Icons.account_circle,
-                          color: Color(0xff7c0019),
-                          size: 30,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  GlassmorphicContainer(
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    height: 60,
-                    margin: const EdgeInsets.only(
-                        bottom: 10, top: 0, left: 20, right: 20),
-                    borderRadius: 50,
-                    linearGradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          0.8,
-                          1
-                        ]),
-                    border: 0,
-                    blur: 0,
-                    borderGradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.2),
-                        ],
-                        stops: const [
-                          0.5,
-                          1
-                        ]),
-                    child: TextField(
-                      cursorColor: const Color(0xff410000),
-                      style: const TextStyle(
-                        letterSpacing: 1,
-                        fontSize: 20,
-                        color: Color(0xff410000),
-                      ),
-                      controller: address,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: 'Address',
-                        labelStyle:
-                            TextStyle(color: Color(0xff410000), fontSize: 20),
-                        prefixIcon: Icon(
-                          Icons.account_circle,
-                          color: Color(0xff7c0019),
-                          size: 30,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  // GlassmorphicContainer(
-                  //   width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
-                  //   height: 60,
-                  //   margin: const EdgeInsets.only(
-                  //       bottom: 10, top: 0, left: 20, right: 20),
-                  //   borderRadius: 50,
-                  //   linearGradient: LinearGradient(
-                  //       begin: Alignment.topLeft,
-                  //       end: Alignment.bottomRight,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.6),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         0.8,
-                  //         1
-                  //       ]),
-                  //   border: 0,
-                  //   blur: 0,
-                  //   borderGradient: LinearGradient(
-                  //       begin: Alignment.topCenter,
-                  //       end: Alignment.bottomCenter,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         1
-                  //       ]),
-                  //   child: TextField(
-                  //     cursorColor: const Color(0xff410000),
-                  //     style: const TextStyle(
-                  //       letterSpacing: 1,
-                  //       fontSize: 20,
-                  //       color: Color(0xff410000),
-                  //     ),
-                  //     controller: nameController,
-                  //     keyboardType: TextInputType.phone,
-                  //     decoration: const InputDecoration(
-                  //       floatingLabelBehavior: FloatingLabelBehavior.auto,
-                  //       labelText: 'Name',
-                  //       labelStyle:
-                  //           TextStyle(color: Color(0xff410000), fontSize: 20),
-                  //       prefixIcon: Icon(
-                  //         Icons.account_circle,
-                  //         color: Color(0xff7c0019),
-                  //         size: 30,
-                  //       ),
-                  //       border: InputBorder.none,
-                  //     ),
-                  //   ),
-                  // ),
-                  // GlassmorphicContainer(
-                  //   width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
-                  //   height: 60,
-                  //   margin: const EdgeInsets.only(
-                  //       bottom: 10, left: 20, right: 20, top: 10),
-                  //   borderRadius: 50,
-                  //   linearGradient: LinearGradient(
-                  //       begin: Alignment.topLeft,
-                  //       end: Alignment.bottomRight,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.6),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         0.8,
-                  //         1
-                  //       ]),
-                  //   border: 0,
-                  //   blur: 0,
-                  //   borderGradient: LinearGradient(
-                  //       begin: Alignment.topCenter,
-                  //       end: Alignment.bottomCenter,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         1
-                  //       ]),
-                  //   child: TextField(
-                  //     cursorColor: const Color(0xff410000),
-                  //     style: const TextStyle(
-                  //       letterSpacing: 1,
-                  //       fontSize: 20,
-                  //       color: Color(0xff410000),
-                  //     ),
-                  //     controller: phoneController,
-                  //     keyboardType: TextInputType.phone,
-                  //     decoration: const InputDecoration(
-                  //       floatingLabelBehavior: FloatingLabelBehavior.auto,
-                  //       labelText: 'Phone',
-                  //       labelStyle:
-                  //           TextStyle(color: Color(0xff410000), fontSize: 20),
-                  //       prefixIcon: Icon(
-                  //         Icons.phone_android,
-                  //         color: Color(0xff7c0019),
-                  //         size: 30,
-                  //       ),
-                  //       border: InputBorder.none,
-                  //     ),
-                  //   ),
-                  // ),
-                  // GlassmorphicContainer(
-                  //   width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
-                  //   height: 60,
-                  //   margin: const EdgeInsets.only(
-                  //       bottom: 10, left: 20, right: 20, top: 10),
-                  //   borderRadius: 50,
-                  //   linearGradient: LinearGradient(
-                  //       begin: Alignment.topLeft,
-                  //       end: Alignment.bottomRight,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.6),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         0.8,
-                  //         1
-                  //       ]),
-                  //   border: 0,
-                  //   blur: 0,
-                  //   borderGradient: LinearGradient(
-                  //       begin: Alignment.topCenter,
-                  //       end: Alignment.bottomCenter,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         1
-                  //       ]),
-                  //   child: TextField(
-                  //     cursorColor: const Color(0xff410000),
-                  //     style: const TextStyle(
-                  //       letterSpacing: 1,
-                  //       fontSize: 20,
-                  //       color: Color(0xff410000),
-                  //     ),
-                  //     textInputAction: TextInputAction.next,
-                  //     keyboardType: TextInputType.text,
-                  //     obscureText: passwordVisible_1,
-                  //     controller: passwordController,
-                  //     decoration: InputDecoration(
-                  //       floatingLabelBehavior: FloatingLabelBehavior.auto,
-                  //       labelText: 'Password',
-                  //       labelStyle: const TextStyle(
-                  //           color: Color(0xff410000), fontSize: 20),
-                  //       prefixIcon: const Icon(
-                  //         Icons.key_outlined,
-                  //         color: Color(0xff7c0019),
-                  //         size: 30,
-                  //       ),
-                  //       suffixIcon: IconButton(
-                  //         icon: Icon(
-                  //           passwordVisible_1
-                  //               ? Icons.visibility_off
-                  //               : Icons.visibility,
-                  //           color: const Color(0xff7c0019),
-                  //         ),
-                  //         onPressed: (() {
-                  //           setState(() {
-                  //             passwordVisible_1 = !passwordVisible_1;
-                  //           });
-                  //         }),
-                  //       ),
-                  //       border: InputBorder.none,
-                  //     ),
-                  //   ),
-                  // ),
-                  // GlassmorphicContainer(
-                  //   width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
-                  //   height: 60,
-                  //   margin: const EdgeInsets.only(
-                  //       bottom: 10, left: 20, right: 20, top: 10),
-                  //   borderRadius: 50,
-                  //   linearGradient: LinearGradient(
-                  //       begin: Alignment.topLeft,
-                  //       end: Alignment.bottomRight,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.6),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         0.8,
-                  //         1
-                  //       ]),
-                  //   border: 0,
-                  //   blur: 0,
-                  //   borderGradient: LinearGradient(
-                  //       begin: Alignment.topCenter,
-                  //       end: Alignment.bottomCenter,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         1
-                  //       ]),
-                  //   child: TextField(
-                  //     cursorColor: const Color(0xff410000),
-                  //     style: const TextStyle(
-                  //       letterSpacing: 1,
-                  //       fontSize: 20,
-                  //       color: Color(0xff410000),
-                  //     ),
-                  //     textInputAction: TextInputAction.next,
-                  //     keyboardType: TextInputType.text,
-                  //     obscureText: passwordVisible_2,
-                  //     controller: comfirmPasswordController,
-                  //     decoration: InputDecoration(
-                  //       floatingLabelBehavior: FloatingLabelBehavior.auto,
-                  //       labelText: 'Comfirm Password',
-                  //       labelStyle: const TextStyle(
-                  //           color: Color(0xff410000), fontSize: 20),
-                  //       prefixIcon: const Icon(
-                  //         Icons.key_outlined,
-                  //         color: Color(0xff7c0019),
-                  //         size: 30,
-                  //       ),
-                  //       suffixIcon: IconButton(
-                  //         icon: Icon(
-                  //           passwordVisible_2
-                  //               ? Icons.visibility_off
-                  //               : Icons.visibility,
-                  //           color: const Color(0xff7c0019),
-                  //         ),
-                  //         onPressed: (() {
-                  //           setState(() {
-                  //             passwordVisible_2 = !passwordVisible_2;
-                  //           });
-                  //         }),
-                  //       ),
-                  //       border: InputBorder.none,
-                  //     ),
-                  //   ),
-                  // ),\
-                  Container(
-                    alignment: Alignment.center,
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    child: TextButton(
-                        onPressed: () {
-                          vaildation();
+
+                    // Password
+                    GlassmorphicContainer(
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
+                      height: 60,
+                      margin: const EdgeInsets.only(
+                          bottom: 10, top: 0, left: 20, right: 20),
+                      borderRadius: 50,
+                      linearGradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            0.8,
+                            1
+                          ]),
+                      border: 0,
+                      blur: 0,
+                      borderGradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            1
+                          ]),
+                      child: TextField(
+                        onChanged: (text) {
+                          if(text.isEmpty || text.length >= 8) {
+                            setState(() {
+                              validatePassword = true;
+                            });
+                          }
+                          else {
+                            setState(() {
+                              validatePassword = false;
+                            });
+                          }
                         },
-                        child: const Text(
-                          "Submit",
+                        cursorColor: const Color(0xff410000),
+                        style: const TextStyle(
+                          letterSpacing: 1,
+                          fontSize: 20,
+                          color: Color(0xff410000),
+                        ),
+                        controller: password,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                          hintText: "Password",
+                          prefixIcon: Icon(
+                            Icons.key_rounded,
+                            color: Color(0xff7c0019),
+                            size: 30,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: !validatePassword,
+                      child: Column(
+                        children: [
+                          Text(
+                            errorMessage[2],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 5,),
+                        ],
+                      ),
+                    ),
+
+                    // Comfirm Password
+                    GlassmorphicContainer(
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
+                      height: 60,
+                      margin: const EdgeInsets.only(
+                          bottom: 10, top: 0, left: 20, right: 20),
+                      borderRadius: 50,
+                      linearGradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.6),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            0.8,
+                            1
+                          ]),
+                      border: 0,
+                      blur: 0,
+                      borderGradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            1
+                          ]),
+                      child: TextField(
+                        onChanged: (text) {
+                          if(text.isEmpty || text == password.text) {
+                            setState(() {
+                              validateConfirmPass = true;
+                            });
+                          }
+                          else {
+                            setState(() {
+                              validateConfirmPass = false;
+                            });
+                          }
+                        },
+                        cursorColor: const Color(0xff410000),
+                        style: const TextStyle(
+                          letterSpacing: 1,
+                          fontSize: 20,
+                          color: Color(0xff410000),
+                        ),
+                        controller: confirmPassword,
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                          hintText: "Confirm Password",
+                          prefixIcon: Icon(
+                            Icons.key_rounded,
+                            color: Color(0xff7c0019),
+                            size: 30,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: !validateConfirmPass,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(width: 10,),
+                          Expanded(child: Text(
+                            errorMessage[3],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.redAccent,
+                            ),),),
+                          const SizedBox(width: 10,),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      child: TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "By creating, you are agreeing to our Terms of use and Privacy Policy.",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 16),
+                            textAlign: TextAlign.center,
+                          )),
+                    ),
+                    GlassmorphicContainer(
+                      width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
+                      height: 60,
+                      margin: const EdgeInsets.only(
+                          bottom: 0, top: 10, left: 20, right: 20),
+                      borderRadius: 50,
+                      linearGradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xff410000).withOpacity(0.8),
+                            const Color(0xff410000).withOpacity(0.6),
+                            const Color(0xff410000).withOpacity(0.3),
+                          ],
+                          stops: const [
+                            0.5,
+                            0.8,
+                            1
+                          ]),
+                      border: 0,
+                      blur: 0,
+                      borderGradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                          stops: const [
+                            0.5,
+                            1
+                          ]),
+                      child: ButtonTheme(
+                        child: MaterialButton(
+                          minWidth: double.infinity,
+                          child: const Text(
+                            'Create',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          ),
+                          onPressed: () {
+                            validation(context);
+                          },
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Already have an account ? ",
                           style: TextStyle(
                               color: Color(0xff410000),
-                              fontStyle: FontStyle.normal,
-                              fontSize: 16),
-                          textAlign: TextAlign.center,
-                        )),
-                  ),
-                  // Container(
-                  //   alignment: Alignment.center,
-                  //   margin: const EdgeInsets.only(left: 10, right: 10),
-                  //   child: TextButton(
-                  //       onPressed: () {},
-                  //       child: const Text(
-                  //         "By creating, you are agreeing to our Terms of use and Privacy Policy.",
-                  //         style: TextStyle(
-                  //             color: Color(0xff410000),
-                  //             fontStyle: FontStyle.normal,
-                  //             fontSize: 16),
-                  //         textAlign: TextAlign.center,
-                  //       )),
-                  // ),
-                  // GlassmorphicContainer(
-                  //   width: MediaQuery.of(context).size.width,
-                  //   alignment: Alignment.center,
-                  //   height: 60,
-                  //   margin: const EdgeInsets.only(
-                  //       bottom: 0, top: 10, left: 20, right: 20),
-                  //   borderRadius: 50,
-                  //   linearGradient: LinearGradient(
-                  //       begin: Alignment.topLeft,
-                  //       end: Alignment.bottomRight,
-                  //       colors: [
-                  //         const Color(0xff410000).withOpacity(0.8),
-                  //         const Color(0xff410000).withOpacity(0.6),
-                  //         const Color(0xff410000).withOpacity(0.3),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         0.8,
-                  //         1
-                  //       ]),
-                  //   border: 0,
-                  //   blur: 0,
-                  //   borderGradient: LinearGradient(
-                  //       begin: Alignment.topCenter,
-                  //       end: Alignment.bottomCenter,
-                  //       colors: [
-                  //         Colors.white.withOpacity(0.8),
-                  //         Colors.white.withOpacity(0.2),
-                  //       ],
-                  //       stops: const [
-                  //         0.5,
-                  //         1
-                  //       ]),
-                  //   child: ButtonTheme(
-                  //     child: MaterialButton(
-                  //       minWidth: double.infinity,
-                  //       child: const Text(
-                  //         'Create',
-                  //         style: TextStyle(fontSize: 20, color: Colors.white),
-                  //       ),
-                  //       onPressed: () {
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Already have an account ? ",
-                        style: TextStyle(
-                            color: Color(0xff410000),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Login()));
-                          });
-                        },
-                        child: const Text(
-                          "Sign in",
-                          style: TextStyle(
-                              color: Colors.black,
                               fontSize: 17,
-                              fontWeight: FontWeight.w900),
+                              fontWeight: FontWeight.w700),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Login()));
+                            });
+                          },
+                          child: const Text(
+                            "Sign in",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                decoration: TextDecoration.underline,
+                                decorationThickness: 2,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

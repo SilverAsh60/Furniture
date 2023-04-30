@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -5,7 +8,8 @@ import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'home.dart';
 
 class Verify extends StatefulWidget {
-  const Verify({super.key});
+  const Verify({super.key, required this.phoneUser});
+  final String phoneUser;
 
   @override
   State<Verify> createState() => _VerifyState();
@@ -14,6 +18,9 @@ class Verify extends StatefulWidget {
 int page = 0;
 
 class _VerifyState extends State<Verify> {
+
+  String otp = "";
+
   Widget getOTP() {
     return Scaffold(
       body: Container(
@@ -65,10 +72,10 @@ class _VerifyState extends State<Verify> {
               const SizedBox(
                 height: 20,
               ),
-              const Text(
-                "+84 868 286 420",
+              Text(
+                widget.phoneUser,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
@@ -115,6 +122,7 @@ class _VerifyState extends State<Verify> {
                     ),
                     onPressed: () {
                       setState(() {
+                        submitPhoneNumber();
                         page = 1;
                       });
                     },
@@ -159,19 +167,19 @@ class _VerifyState extends State<Verify> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     "Enter the OTP sent to",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.normal),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Text("+84 868 286 420",
-                      style: TextStyle(
+                  Text(widget.phoneUser,
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold)),
@@ -195,10 +203,17 @@ class _VerifyState extends State<Verify> {
 
                 onSubmit: (String verificationCode) {
                   setState(() {
-                    page = 2;
+                    otp = verificationCode;
+                    submitOTP();
+                    verify();
+                    if(verifyTr) {
+                      page = 2;
+                    }
+                    //page = 2;
                   });
                 }, // end onSubmit
               ),
+              //Text(status,),
               GlassmorphicContainer(
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.center,
@@ -240,9 +255,7 @@ class _VerifyState extends State<Verify> {
                       style: TextStyle(fontSize: 20, color: Colors.black),
                     ),
                     onPressed: () {
-                      setState(() {
-                        page = 1;
-                      });
+                      page = 1;
                     },
                   ),
                 ),
@@ -253,6 +266,11 @@ class _VerifyState extends State<Verify> {
   }
 
   Widget getSuccess() {
+
+    Timer(const Duration(milliseconds: 2000), () {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+    });
+
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
@@ -345,6 +363,26 @@ class _VerifyState extends State<Verify> {
     );
   }
 
+  late String status = "";
+  late AuthCredential phoneAuthCredential;
+  late String verificationID;
+  late int code;
+  late String errorMessage = "";
+  bool verifyTr = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void handleError(e) {
+    print(e.message);
+    setState(() {
+      errorMessage += e.message + '\n';
+      status += e.message + '\n';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (page == 1) {
@@ -353,6 +391,74 @@ class _VerifyState extends State<Verify> {
       return getSuccess();
     } else {
       return getOTP();
+    }
+  }
+
+  Future<void> submitPhoneNumber() async {
+    String phoneNumber = widget.phoneUser;
+    print(phoneNumber);
+
+    void verificationCompleted(AuthCredential phoneAuth) {
+      print('verificationCompleted');
+      setState(() {
+        status += 'verificationCompleted\n';
+      });
+
+      phoneAuthCredential = phoneAuth;
+      print(phoneAuthCredential);
+    }
+
+    void verificationFailed(FirebaseAuthException error) {
+      print('verificationFailed');
+      handleError(error);
+    }
+
+    void codeOTPSent(String verificationId, [int? code]) {
+      print ('OTP sent') ;
+      verificationID = verificationId;
+      print(verificationId);
+      this.code = code!;
+      print(code.toString());
+      setState(() {
+        status += 'Code Sent\n';
+      });
+    }
+    
+    void codeAutoRetrievalTimout(String verificationId) {
+      print('codeAutoRetrievalTimeout');
+      setState(() {
+        status += 'codeAutoRetrievalTimeout\n';
+      });
+      print(verificationId);
+    }
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+        timeout: const Duration(milliseconds: 30000),
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeOTPSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimout
+    );
+  }
+
+  void submitOTP() {
+    String smsCode = otp;
+    phoneAuthCredential = PhoneAuthProvider.credential(
+        verificationId: verificationID, smsCode: smsCode);
+  }
+  
+  Future<void> verify() async {
+    try {
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential)
+          .then((value) => debugPrint(value.user.toString())).catchError((e) => handleError(e));
+      setState(() {
+        status += 'Signed In\n';
+        verifyTr = true;
+      });
+    }
+    catch (e) {
+      handleError(e);
     }
   }
 }

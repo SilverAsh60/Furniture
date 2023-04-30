@@ -1,25 +1,22 @@
-class Banner1 {
+import 'package:equatable/equatable.dart';
+
+class Banner1 extends Equatable{
   final String id;
   final String dateStart;
   final String dateEnd;
   final String imgURL;
   final String status;
+  final List<String> product;
 
-  Banner1({
+  const Banner1({
     required this.id,
     required this.dateEnd,
     required this.dateStart,
     required this.imgURL,
     required this.status,
+    required this.product
   });
 
-  factory Banner1.fromMap(Map data) {
-    return Banner1(
-      id: data['id'],
-      dateEnd: data['dateEnd'],
-      dateStart: data['dateStart'],
-      imgURL: data['imgURL'],
-      status: data['status'],
-    );
-  }
+  @override
+  List<Object?> get props => [id,dateStart,dateEnd,imgURL,status,product];
 }

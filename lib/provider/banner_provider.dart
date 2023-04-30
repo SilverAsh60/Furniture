@@ -9,25 +9,22 @@ class BannerProvider with ChangeNotifier {
 
   Future<void> getBanner() async {
     List<Banner1> newList = [];
-    List<String> newlistBannerIMG = [];
-
-    QuerySnapshot bannerSnaphot = (await FirebaseFirestore.instance.collection("banner").snapshots()) as QuerySnapshot<Object?>;
+    QuerySnapshot bannerSnaphot = await FirebaseFirestore.instance.collection("banner").get();
 
     for (var element in bannerSnaphot.docs) {
       banner = Banner1(
-        id: element["id"].toString(),
-        imgURL: element["imgURL"].toString(),
+        id: element.reference.id,
+        imgURL: element["img"].toString(),
         dateStart: element["dateStart"].toString(),
         dateEnd: element["dateEnd"].toString(),
-        status: element["status"].toString(),
+        status: element["status"].toString(), 
+        product: List.from(element['product']),
       );
 
       newList.add(banner);
-      newlistBannerIMG.add(banner.imgURL.toString());
     }
 
     listBanner = newList;
-    listBannerIMG = newlistBannerIMG;
     notifyListeners();
   }
 

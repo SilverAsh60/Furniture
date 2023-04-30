@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 Widget getCategoryList(List<Category> categoryList) {
 
-  AssetImage placeImage = const AssetImage("assets/images/logo.png");
+  //AssetImage placeImage = const AssetImage("assets/images/logo.png");
   return Container(
-    margin: const EdgeInsets.all(10),
-    height: 140,
+    margin: const EdgeInsets.only(left: 10,right: 10),
+    height: 160,
     alignment: Alignment.center,
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -17,8 +17,8 @@ Widget getCategoryList(List<Category> categoryList) {
             .map(
               (element) => Container(
             // margin: EdgeInsets.symmetric(horizontal: 5),
-            width: 150,
-            height: 140,
+            width: 130,
+            height: 160,
             alignment: Alignment.center,
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -26,6 +26,7 @@ Widget getCategoryList(List<Category> categoryList) {
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(top: 20),
                   height: 100,
                   width: 100,
                   decoration: const BoxDecoration(
@@ -33,14 +34,23 @@ Widget getCategoryList(List<Category> categoryList) {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Color.fromRGBO(179, 213, 242, 0.2),
-                        spreadRadius: 5,
-                        blurRadius: 3,
+                        //color: Color.fromRGBO(179, 213, 242, 0.2),
+                        color: Color(0xffe3eaef),
+                        spreadRadius: 0.06,
+                        blurRadius: 24,
+                        offset: Offset(12, 12)
+                      ),
+                      BoxShadow(
+                        //color: Color.fromRGBO(179, 213, 242, 0.2),
+                          color: Color(0xffffffff),
+                          spreadRadius: 0.06,
+                          blurRadius: 24,
+                          offset: Offset(-12, -12)
                       ),
                     ],
                   ),
                   //child: Image(image: NetworkImage(element.img),fit: BoxFit.fill),
-                  child: Image(image: placeImage,fit: BoxFit.fill),
+                  child: Image(image: AssetImage(element.img),fit: BoxFit.fill),
                 ),
                 Container(
                   alignment: Alignment.center,

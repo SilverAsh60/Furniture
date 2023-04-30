@@ -1,6 +1,9 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fan_carousel_image_slider/fan_carousel_image_slider.dart';
+import 'package:final_project_funiture_app/provider/banner_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/banner_model.dart';
 
 class BannerWidget extends StatefulWidget {
   const BannerWidget({super.key});
@@ -10,51 +13,54 @@ class BannerWidget extends StatefulWidget {
   State<BannerWidget> createState() => _BannerWidgetState();
 }
 
+BannerProvider provider = BannerProvider();
+
+List<Banner1> listBanner = [];
+
 class _BannerWidgetState extends State<BannerWidget> {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final List<String> listBanner = [
-    "assets/images/logo.png",
-    "assets/images/logo.png",
-    "assets/images/logo.png",
-    "assets/images/logo.png",
-  ];
-
-  /*getBanner() async {
-    return await firestore.collection("banner").get().then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        setState(() {
-          listBanner.add(doc['imgURL'].toString());
-        });
-      }
-    });
-  }*/
 
   @override
   void initState() {
-    //getBanner();
+    provider.getBanner();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (listBanner.isNotEmpty) {
-      return Container(
-        padding: const EdgeInsets.only(top: 10),
-        child: FanCarouselImageSlider(
-          imagesLink: listBanner,
-          isAssets: true,
-          sliderHeight: 244,
-          sliderWidth: 430,
-          sidesOpacity: 0.3,
-          imageFitMode: BoxFit.fill,
-          imageRadius: 10,
-          sliderDuration: const Duration(seconds: 1),
-          autoPlayInterval: const Duration(seconds: 4),
-          indicatorActiveColor: const Color(0xff80221e),
-          indicatorDeactiveColor: const Color(0xffb85c48),
-          isClickable: false,
+    provider = Provider.of<BannerProvider>(context);
+    provider.getBanner();
+    listBanner = provider.getListBanner;
+    if(listBanner.isNotEmpty) {
+      return CarouselSlider(
+        options: CarouselOptions(
+          aspectRatio: 16/9,
+          autoPlay: true,
+          autoPlayCurve: Curves.fastOutSlowIn,
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
+          enlargeCenterPage: true,
+            viewportFraction: 0.8,
+            enableInfiniteScroll: true,
+            height: 180.0,
+          initialPage: 0,
         ),
+        items: listBanner.map((banner) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                margin: const EdgeInsets.all(6.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  image: DecorationImage(
+                    image: AssetImage(banner.imgURL),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
       );
     }
     else {

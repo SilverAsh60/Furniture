@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:final_project_funiture_app/screens/checkout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -107,7 +108,7 @@ class _CartPageState extends State<CartPage> {
                           Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               /*FadeInImage(
                                 image: NetworkImage(snapshot.data![index].imgProduct
                                     ),
@@ -117,7 +118,7 @@ class _CartPageState extends State<CartPage> {
                               ),*/
 
                               Image(image: AssetImage(
-                                  "assets/images/logo.png"),width: 90,
+                                  snapshot.data![index].imgProduct),width: 90,
                                   height: 90)
                             ],
                           ),
@@ -324,7 +325,9 @@ class _CartPageState extends State<CartPage> {
             children: [
               const SizedBox(height: 20,),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckoutPage()));
+                },
                 child:  Container(
                   alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width / 1.5,

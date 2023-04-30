@@ -3,7 +3,6 @@ import 'package:final_project_funiture_app/screens/collection.dart';
 import 'package:final_project_funiture_app/screens/favorite.dart';
 import 'package:final_project_funiture_app/screens/home.dart';
 import 'package:final_project_funiture_app/screens/notification.dart';
-import 'package:final_project_funiture_app/screens/profilescreen.dart';
 import 'package:flutter/material.dart';
 
 var bottomNavigationBarItems = <BottomNavigationBarItem>[
@@ -55,15 +54,6 @@ var bottomNavigationBarItems = <BottomNavigationBarItem>[
     ),
     label: "Favorite",
   ),
-  const BottomNavigationBarItem(
-    backgroundColor: Color(0x00ffffff),
-    icon: Icon(Icons.account_circle_rounded, color: Colors.black),
-    activeIcon: Icon(
-      Icons.favorite_border_outlined,
-      color: Color(0xff80221e),
-    ),
-    label: "Profile",
-  ),
 ];
 
 Widget getFooter(int selectedItem, BuildContext context) {
@@ -89,8 +79,8 @@ void itemClick(int selectedItem, BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const HomePage()));
   } else if (selectedItem == 1) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const CollectionPage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const CollectionPage()));
   } else if (selectedItem == 2) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const CartPage()));
@@ -100,8 +90,5 @@ void itemClick(int selectedItem, BuildContext context) {
   } else if (selectedItem == 4) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const FavoritePage()));
-  } else if (selectedItem == 5) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ProfileScreen()));
   }
 }

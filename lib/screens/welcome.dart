@@ -1,23 +1,49 @@
 import 'dart:async';
 
+import 'package:final_project_funiture_app/screens/home.dart';
 import 'package:final_project_funiture_app/screens/introduce.dart';
+import 'package:final_project_funiture_app/screens/login.dart';
+import 'package:final_project_funiture_app/screens/register.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Welcome extends StatefulWidget {
-  const Welcome({super.key});
+class Welcom extends StatefulWidget {
+  const Welcom({super.key});
 
   @override
-  State<Welcome> createState() => _WelcomeState();
+  State<Welcom> createState() => _WelcomState();
 }
 
-class _WelcomeState extends State<Welcome> {
-  @override
-  void initState() {
-    super.initState();
+class _WelcomState extends State<Welcom> {
 
-    Timer(const Duration(seconds: 3), () {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const Introduce()));
+  @override
+  void initState()  {
+    super.initState();
+    getPrefs();
+  }
+
+  Future<void> getPrefs() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? hideIntroducePage = prefs.getBool('SHOW_INTRODUCT_PAGE');
+    bool? hideLoginPage = prefs.getBool('LOGIN');
+
+    Timer(const Duration(seconds: 4), () {
+
+      if (hideIntroducePage != null && hideIntroducePage == true) {
+        if(hideLoginPage != null && hideLoginPage == true) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const HomePage()));
+        }
+        else {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const Register()));
+        }
+      }
+      else
+      {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const Introduce()));
+      }
     });
   }
 
