@@ -78,9 +78,9 @@ class _CartPageState extends State<CartPage> {
                     key: ValueKey<int>(snapshot.data![index].idCart!),
                     onDismissed: (DismissDirection direction) async {
                       await handler.deleteCart(snapshot.data![index].idCart!);
-                      setState(() {
-                        snapshot.data!.remove(snapshot.data![index]);
-                      });
+                      // setState(() {
+                      //   snapshot.data!.remove(snapshot.data![index]);
+                      // });
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width,

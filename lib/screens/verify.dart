@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -8,8 +9,9 @@ import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'home.dart';
 
 class Verify extends StatefulWidget {
-  const Verify({super.key, required this.phoneUser});
+  const Verify({super.key, required this.phoneUser, required this.idUser});
   final String phoneUser;
+  final String idUser;
 
   @override
   State<Verify> createState() => _VerifyState();
@@ -122,7 +124,7 @@ class _VerifyState extends State<Verify> {
                     ),
                     onPressed: () {
                       setState(() {
-                        submitPhoneNumber();
+                        submitPhoneNumber(context);
                         page = 1;
                       });
                     },
@@ -205,10 +207,7 @@ class _VerifyState extends State<Verify> {
                   setState(() {
                     otp = verificationCode;
                     submitOTP();
-                    verify();
-                    if(verifyTr) {
-                      page = 2;
-                    }
+                    verify(context);
                     //page = 2;
                   });
                 }, // end onSubmit
@@ -255,7 +254,9 @@ class _VerifyState extends State<Verify> {
                       style: TextStyle(fontSize: 20, color: Colors.black),
                     ),
                     onPressed: () {
-                      page = 1;
+                      if(verifyTr) {
+                        page = 2;
+                      }
                     },
                   ),
                 ),
@@ -267,6 +268,7 @@ class _VerifyState extends State<Verify> {
 
   Widget getSuccess() {
 
+    Navigator.pop(context);
     Timer(const Duration(milliseconds: 2000), () {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
     });
@@ -376,11 +378,53 @@ class _VerifyState extends State<Verify> {
   }
 
   void handleError(e) {
-    print(e.message);
+    Navigator.pop(context);
+    if (kDebugMode) {
+      print(e.message);
+    }
     setState(() {
       errorMessage += e.message + '\n';
       status += e.message + '\n';
     });
+
+    showDialog(
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: const Color(0xff560f20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                  // Some text
+                  const SizedBox(height: 20),
+                  Text(errorMessage,style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),),
+                  const SizedBox(height: 20,),
+                  ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color> (const Color(0xffecd8e0)),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }, child: const Text('OK' , style: TextStyle(
+                    color: Color(0xff560f20),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),)),
+                ],
+              ),
+            ),
+          );
+        }
+    );
+
   }
 
   @override
@@ -394,52 +438,133 @@ class _VerifyState extends State<Verify> {
     }
   }
 
-  Future<void> submitPhoneNumber() async {
+  Future<void> submitPhoneNumber(context) async {
+
+    showDialog(
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: const Color(0xff560f20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  SizedBox(height: 20,),
+                  CircularProgressIndicator(color: Color(0xffecd8e0),),
+                  SizedBox(height: 20,),
+                ],
+              ),
+            ),
+          );
+        }
+    );
+
     String phoneNumber = widget.phoneUser;
-    print(phoneNumber);
+    if (kDebugMode) {
+      print(phoneNumber);
+    }
 
     void verificationCompleted(AuthCredential phoneAuth) {
-      print('verificationCompleted');
+      if (kDebugMode) {
+        print('verificationCompleted');
+      }
       setState(() {
         status += 'verificationCompleted\n';
       });
-
       phoneAuthCredential = phoneAuth;
-      print(phoneAuthCredential);
+      if (kDebugMode) {
+        print(phoneAuthCredential);
+      }
     }
 
     void verificationFailed(FirebaseAuthException error) {
-      print('verificationFailed');
+      Navigator.pop(context);
+      if (kDebugMode) {
+        print('verificationFailed');
+      }
       handleError(error);
+      showDialog(
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                    // Some text
+                    const SizedBox(height: 20),
+                    Text(errorMessage,style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),),
+                    const SizedBox(height: 20,),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color> (const Color(0xffecd8e0)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }, child: const Text('OK' , style: TextStyle(
+                      color: Color(0xff560f20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),)),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
+
     }
 
     void codeOTPSent(String verificationId, [int? code]) {
-      print ('OTP sent') ;
+      if (kDebugMode) {
+        print ('OTP sent') ;
+      }
       verificationID = verificationId;
-      print(verificationId);
+      if (kDebugMode) {
+        print(verificationId);
+      }
       this.code = code!;
-      print(code.toString());
+      if (kDebugMode) {
+        print(code.toString());
+      }
       setState(() {
         status += 'Code Sent\n';
       });
     }
     
     void codeAutoRetrievalTimout(String verificationId) {
-      print('codeAutoRetrievalTimeout');
+      if (kDebugMode) {
+        print('codeAutoRetrievalTimeout');
+      }
       setState(() {
         status += 'codeAutoRetrievalTimeout\n';
       });
-      print(verificationId);
+      if (kDebugMode) {
+        print(verificationId);
+      }
     }
+
 
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-        timeout: const Duration(milliseconds: 30000),
+        timeout: const Duration(milliseconds: 3000),
         verificationCompleted: verificationCompleted,
         verificationFailed: verificationFailed,
         codeSent: codeOTPSent,
         codeAutoRetrievalTimeout: codeAutoRetrievalTimout
     );
+
+    Navigator.pop(context);
   }
 
   void submitOTP() {
@@ -448,17 +573,133 @@ class _VerifyState extends State<Verify> {
         verificationId: verificationID, smsCode: smsCode);
   }
   
-  Future<void> verify() async {
+  Future<void> verify(context) async {
+    if (kDebugMode) {
+      print('Verify');
+    }
     try {
-      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential)
-          .then((value) => debugPrint(value.user.toString())).catchError((e) => handleError(e));
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    SizedBox(height: 20,),
+                    CircularProgressIndicator(color: Color(0xffecd8e0),),
+                    SizedBox(height: 20,),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential).then((value) async => await FirebaseFirestore.instance.collection('user').doc(widget.idUser).set({'status' : 'VALID' }));
       setState(() {
         status += 'Signed In\n';
         verifyTr = true;
+        page = 2;
       });
+      
+      
+
+      if (kDebugMode) {
+        print("sucess");
+      }
+    }
+    on FirebaseAuthException catch(err) {
+      Navigator.pop(context);
+      String message = "Error";
+      if(err.code == "invalid-verification-code") {
+        message = "OTP not match";
+      }
+
+      showDialog(
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                    // Some text
+                    const SizedBox(height: 20),
+                    Text(message,style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),),
+                    const SizedBox(height: 20,),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color> (const Color(0xffecd8e0)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }, child: const Text('OK' , style: TextStyle(
+                      color: Color(0xff560f20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),)),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
+
     }
     catch (e) {
       handleError(e);
+      if (kDebugMode) {
+        print('Error Verify');
+      }
+      showDialog(
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                    // Some text
+                    const SizedBox(height: 20),
+                    Text(errorMessage,style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),),
+                    const SizedBox(height: 20,),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color> (const Color(0xffecd8e0)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }, child: const Text('OK' , style: TextStyle(
+                      color: Color(0xff560f20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),)),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
     }
   }
 }

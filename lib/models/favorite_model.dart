@@ -1,11 +1,13 @@
-class Favorite {
+import 'package:equatable/equatable.dart';
+
+class Favorite extends Equatable{
   final String idProduct;
   final String nameProduct;
   final String imgProduct;
   final int? idFavorite;
   final double price;
 
-  Favorite({
+  const Favorite({
     this.idFavorite,
     required this.imgProduct,
     required this.nameProduct,
@@ -25,5 +27,8 @@ class Favorite {
   Map<String, Object?> toMap() {
     return {'idFavorite':idFavorite,'idProduct': idProduct, 'nameProduct':nameProduct , 'imgProduct':imgProduct, 'price': price};
   }
+
+  @override
+  List<Object?> get props => [idProduct,nameProduct,price];
 
 }

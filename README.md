@@ -7,7 +7,7 @@ Final Project - Funiture App Ecommerce
 * Login
     * Validate form
     * Show Dialog with FirebaseAuthException
-    * Login with Firebbase Auth
+    * Login with Firebase Auth
 * Register
     * Validate form
     * Show Dialog with FirebaseAuthException
@@ -26,6 +26,7 @@ Final Project - Funiture App Ecommerce
 * Product Detail
     * Add to cart
     * Add to favorite
+    * Show Full screen Product
     * Show detail
     * Show product follow color
 * Cart Page

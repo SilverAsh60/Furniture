@@ -1,4 +1,6 @@
-class Cart {
+import 'package:equatable/equatable.dart';
+
+class Cart extends Equatable{
   final String idProduct;
   final String nameProduct;
   final String imgProduct;
@@ -7,7 +9,7 @@ class Cart {
   final int quantity;
   final double price;
 
-  Cart({
+  const Cart({
     this.idCart,
     required this.imgProduct,
     required this.nameProduct,
@@ -29,5 +31,8 @@ class Cart {
   Map<String, Object?> toMap() {
     return {'idCart':idCart,'quantity': quantity, 'color':color,'idProduct': idProduct, 'nameProduct':nameProduct , 'imgProduct':imgProduct, 'price': price};
   }
+
+  @override
+  List<Object?> get props => [quantity,idProduct,color,nameProduct,imgProduct,price];
 
 }

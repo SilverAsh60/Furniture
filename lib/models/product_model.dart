@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
-class Product {
+class Product extends Equatable {
   final String name;
   final String img;
   final String id;
@@ -14,8 +14,10 @@ class Product {
   final double review;
   final double sellest;
   final String title;
+  final List<ProductItem> productItemList;
+  final List<Review> reviewList;
 
-  Product({
+  const Product({
     required this.title,
     required this.name,
     required this.img,
@@ -29,17 +31,65 @@ class Product {
     required this.material,
     required this.review,
     required this.sellest,
+    required this.productItemList,
+    required this.reviewList,
   });
+
+  @override
+  List<Object?> get props => [
+        title,
+        name,
+        img,
+        id,
+        description,
+        size,
+        rootPrice,
+        currentPrice,
+        categoryItemId,
+        status,
+        material,
+        review,
+        sellest,
+        productItemList
+      ];
 }
 
-class ProductItem {
+class ProductItem extends Equatable {
   final String id;
-  final Map<String,String> color;
+  final Map<String, String> color;
   final List<String> img;
 
-  ProductItem({
+  const ProductItem({
     required this.img,
     required this.color,
     required this.id,
   });
+
+  @override
+  List<Object?> get props => [img, color, id];
+}
+
+class Review extends Equatable {
+  final String idOrder;
+  final String idUser;
+  final String id;
+  final String message;
+  final List<String> img;
+  final DateTime date;
+  final Map<String,dynamic> service;
+  final double star;
+
+  const Review({
+    required this.id,
+    required this.idUser,
+    required this.idOrder,
+    required this.message,
+    required this.img,
+    required this.date,
+    required this.service,
+    required this.star,
+  });
+
+  @override
+  List<Object?> get props => [idOrder, idUser, id, message, img, date,service,star];
 }

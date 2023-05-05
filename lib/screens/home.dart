@@ -1,5 +1,6 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:final_project_funiture_app/constant.dart/size_config.dart';
 import 'package:final_project_funiture_app/provider/banner_provider.dart';
 import 'package:final_project_funiture_app/provider/category_provider.dart';
 import 'package:final_project_funiture_app/provider/product_provider.dart';
@@ -8,7 +9,6 @@ import 'package:final_project_funiture_app/screens/favorite.dart';
 import 'package:final_project_funiture_app/screens/product_detail.dart';
 import 'package:final_project_funiture_app/widgets/banner.dart';
 import 'package:final_project_funiture_app/widgets/bottom_navy_bar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glassmorphism/glassmorphism.dart';
@@ -75,6 +75,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     bannerProvider = Provider.of<BannerProvider>(context);
     categoryProvider = Provider.of<CategoryProvider>(context);
     productProvider = Provider.of<ProductProvider>(context);
@@ -125,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                searchField(),
+                searchField(context),
                 Row(
                   children: [
                     badges.Badge(
@@ -376,820 +377,989 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Wiget Product New Archive
+  // Widget Product New Archive
   Widget getProductList(List<Product> produceList, BuildContext context) {
     //AssetImage placeImage = const AssetImage("assets/images/logo.png");
-    return Container(
-      margin: const EdgeInsets.only(left: 10,right: 10),
-      height: 300,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Wrap(
-          spacing: -1,
-          direction: Axis.vertical,
-          children: produceList
-              .map(
-                (element) => Container(
-                  //margin: const EdgeInsets.symmetric(horizontal: 5),
-                  alignment: Alignment.center,
-                  //padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.only(top: 20,right: 10),
-                  width: 200,
-                  height: 260,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.white,
-                  ),
+    if(produceList.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: produceList
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
 
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              ProductDetailPage(productID: element.id)));
-                    },
-                    child: Stack(
-                      children: [
-                        // img
-                        Container(
-                          width: 200,
-                          height: 170,
-                          padding: const EdgeInsets.all(10),
-                          child: Image(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ProductDetailPage(productID: element,)));
+                  },
+                  child: Stack(
+                    children: [
+                      // img
+                      Container(
+                        width: 200,
+                        height: 170,
+                        padding: const EdgeInsets.all(10),
+                        child: Hero(
+                          tag: element.id,
+                          child: FadeInImage(
                             image: AssetImage(element.img),
+                            fadeInDuration: const Duration(milliseconds: 2000),
                             fit: BoxFit.contain,
+                            placeholder: const AssetImage("assets/icons/spinner170.gif"),
                           ),
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 150),
-                          padding: const EdgeInsets.all(5),
-                          height: 260,
-                          alignment: Alignment.bottomCenter,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // name product
-                                      AutoSizeText(
-                                        element.name,
-                                        maxFontSize: 18,
-                                        minFontSize: 12,
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 2,
-                                      ),
-                                      // title product
-                                      Text(
-                                        element.title,
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: "Roboto",
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 2,
-                                      ),
-
-                                      // Rate
-                                      RatingBar.builder(
-                                        ignoreGestures: true,
-                                        initialRating: element.review,
-                                        itemSize: 15,
-                                        minRating: 0,
-                                        direction: Axis.horizontal,
-                                        allowHalfRating: true,
-                                        itemCount: 5,
-                                        unratedColor: Colors.grey,
-                                        itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
-                                        itemBuilder: (context, _) => const Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                        ),
-                                        onRatingUpdate: (rating) {
-                                          //print(rating);
-                                        },
-                                      ),
-
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(
-                                        children: [
-                                          AutoSizeText(
-                                            "(Sold ${element.sellest.toStringAsFixed(0)})",
-                                            maxFontSize: 12,
-                                            minFontSize: 12,
-                                            textAlign: TextAlign.start,
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Roboto",
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                              ),
-                              Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(width: 1,color: const Color(0xff81220e)),
-                                        borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                      ),
-
-                                      child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20,),
-                                  AutoSizeText(
-                                    getDecorPrice(element.currentPrice),
-                                    maxFontSize: 15,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Color(0xff80221e),
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 150),
+                        padding: const EdgeInsets.all(5),
+                        height: 260,
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
                           children: [
-                            Container(
-                              margin: const EdgeInsets.only(left: 5),
-                              width: 40,
-                              height: 40,
-                              alignment: Alignment.center,
-                              child: const Image(image: AssetImage("assets/icons/new.png"),fit: BoxFit.fill,),
-                            ),
-                            IconButton(
-                              icon: getIconFavorite(
-                                  element.id, listFavorite, element),
-                              onPressed: () {
-                                setState(() {
-                                  var favorite = Favorite(
-                                    imgProduct: element.img,
-                                    nameProduct: element.name,
-                                    idProduct: element.id,
-                                    price: element.currentPrice,
-                                  );
+                            Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // name product
+                                    AutoSizeText(
+                                      element.name,
+                                      maxFontSize: 18,
+                                      minFontSize: 12,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 2,
+                                    ),
+                                    // title product
+                                    Text(
+                                      element.title,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: "Roboto",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 2,
+                                    ),
 
-                                  handler.insertFavorite(favorite);
-                                  handler.retrieveFavorites();
-                                });
-                              },
+                                    // Rate
+                                    RatingBar.builder(
+                                      ignoreGestures: true,
+                                      initialRating: element.review,
+                                      itemSize: 15,
+                                      minRating: 0,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      unratedColor: Colors.grey,
+                                      itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        //print(rating);
+                                      },
+                                    ),
+
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        AutoSizeText(
+                                          "(Sold ${element.sellest.toStringAsFixed(0)})",
+                                          maxFontSize: 12,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                            ),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1,color: const Color(0xff81220e)),
+                                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                    ),
+
+                                    child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
+                                  ),
+                                ),
+                                const SizedBox(height: 20,),
+                                AutoSizeText(
+                                  getDecorPrice(element.currentPrice),
+                                  maxFontSize: 15,
+                                  minFontSize: 12,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                    color: Color(0xff80221e),
+                                    fontFamily: "Roboto",
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                              ],
                             ),
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
-  }
-  Widget getTopSellerProductList(List<Product> produceList, BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left: 10,right: 10),
-      height: 300,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Wrap(
-          spacing: -1,
-          direction: Axis.vertical,
-          children: produceList
-              .map(
-                (element) => Container(
-              //margin: const EdgeInsets.symmetric(horizontal: 5),
-              alignment: Alignment.center,
-              //padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(top: 20,right: 10),
-              width: 200,
-              height: 260,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-              ),
-
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailPage(productID: element.id)));
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 200,
-                      height: 170,
-                      padding: const EdgeInsets.all(10),
-                      child: Image(
-                        image: AssetImage(element.img),
-                        fit: BoxFit.contain,
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 150),
-                      padding: const EdgeInsets.all(5),
-                      height: 260,
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // name product
-                                  AutoSizeText(
-                                    element.name,
-                                    maxFontSize: 18,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-                                  // title product
-                                  Text(
-                                    element.title,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-
-                                  // Rate
-                                  RatingBar.builder(
-                                    ignoreGestures: true,
-                                    initialRating: element.review,
-                                    itemSize: 15,
-                                    minRating: 0,
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: true,
-                                    itemCount: 5,
-                                    unratedColor: Colors.grey,
-                                    itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      //print(rating);
-                                    },
-                                  ),
-
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      AutoSizeText(
-                                        "(Sold ${element.sellest.toStringAsFixed(0)})",
-                                        maxFontSize: 12,
-                                        minFontSize: 12,
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
+                          Container(
+                            margin: const EdgeInsets.only(left: 5),
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.center,
+                            child: const Image(image: AssetImage("assets/icons/new.png"),fit: BoxFit.fill,),
                           ),
-                          Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1,color: const Color(0xff81220e)),
-                                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                  ),
+                          IconButton(
+                            icon: getIconFavorite(
+                                element.id, listFavorite, element),
+                            onPressed: () {
+                              setState(() {
+                                var favorite = Favorite(
+                                  imgProduct: element.img,
+                                  nameProduct: element.name,
+                                  idProduct: element.id,
+                                  price: element.currentPrice,
+                                );
 
-                                  child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
-                                ),
-                              ),
-                              const SizedBox(height: 20,),
-                              AutoSizeText(
-                                getDecorPrice(element.currentPrice),
-                                maxFontSize: 15,
-                                minFontSize: 12,
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  color: Color(0xff80221e),
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                            ],
+                                handler.insertFavorite(favorite);
+                                handler.retrieveFavorites();
+                              });
+                            },
                           ),
                         ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(left: 5),
-                          width: 40,
-                          height: 40,
-                          alignment: Alignment.center,
-                          child: const Image(image: AssetImage("assets/icons/hot-sale.png"),fit: BoxFit.fill,),
-                        ),
-                        IconButton(
-                          icon: getIconFavorite(
-                              element.id, listFavorite, element),
-                          onPressed: () {
-                            setState(() {
-                              var favorite = Favorite(
-                                imgProduct: element.img,
-                                nameProduct: element.name,
-                                idProduct: element.id,
-                                price: element.currentPrice,
-                              );
-
-                              handler.insertFavorite(favorite);
-                              handler.retrieveFavorites();
-                            });
-                          },
-                        ),
-                      ],
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          )
-              .toList(),
+            )
+                .toList(),
+          ),
         ),
-      ),
-    );
+      );
+    }
+    else {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: [1,2]
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                    child: Center (
+                      child: Image.asset("assets/icons/spinner170.gif"),
+                    ),
+              ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
+  }
+  Widget getTopSellerProductList(List<Product> produceList, BuildContext context) {
+    if(produceList.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: produceList
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ProductDetailPage(productID: element)));
+                  },
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 200,
+                        height: 170,
+                        padding: const EdgeInsets.all(10),
+                        child: FadeInImage(
+                          image: AssetImage(element.img),
+                          fit: BoxFit.contain,
+                          fadeInDuration: const Duration(milliseconds: 2000),
+                          placeholder: const AssetImage("assets/icons/spinner170.gif"),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 150),
+                        padding: const EdgeInsets.all(5),
+                        height: 260,
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // name product
+                                    AutoSizeText(
+                                      element.name,
+                                      maxFontSize: 18,
+                                      minFontSize: 12,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 2,
+                                    ),
+                                    // title product
+                                    Text(
+                                      element.title,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: "Roboto",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 2,
+                                    ),
+
+                                    // Rate
+                                    RatingBar.builder(
+                                      ignoreGestures: true,
+                                      initialRating: element.review,
+                                      itemSize: 15,
+                                      minRating: 0,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      unratedColor: Colors.grey,
+                                      itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        //print(rating);
+                                      },
+                                    ),
+
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        AutoSizeText(
+                                          "(Sold ${element.sellest.toStringAsFixed(0)})",
+                                          maxFontSize: 12,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                            ),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1,color: const Color(0xff81220e)),
+                                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                    ),
+
+                                    child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
+                                  ),
+                                ),
+                                const SizedBox(height: 20,),
+                                AutoSizeText(
+                                  getDecorPrice(element.currentPrice),
+                                  maxFontSize: 15,
+                                  minFontSize: 12,
+                                  textAlign: TextAlign.start,
+                                  style: const TextStyle(
+                                    color: Color(0xff80221e),
+                                    fontFamily: "Roboto",
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(left: 5),
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.center,
+                            child: const Image(image: AssetImage("assets/icons/hot-sale.png"),fit: BoxFit.fill,),
+                          ),
+                          IconButton(
+                            icon: getIconFavorite(
+                                element.id, listFavorite, element),
+                            onPressed: () {
+                              setState(() {
+                                var favorite = Favorite(
+                                  imgProduct: element.img,
+                                  nameProduct: element.name,
+                                  idProduct: element.id,
+                                  price: element.currentPrice,
+                                );
+
+                                handler.insertFavorite(favorite);
+                                handler.retrieveFavorites();
+                              });
+                            },
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
+    else {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: [1,2]
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                child: Center (
+                  child: Image.asset("assets/icons/spinner170.gif"),
+                ),
+              ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
   }
   Widget getDiscountProductList(List<Product> produceList, BuildContext context) {
 
-    return Container(
-      margin: const EdgeInsets.only(left: 10,right: 10),
-      height: 300,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Wrap(
-          spacing: -1,
-          direction: Axis.vertical,
-          children: produceList
-              .map(
-                (element) => Container(
-              //margin: const EdgeInsets.symmetric(horizontal: 5),
-              alignment: Alignment.center,
-              //padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(top: 20,right: 10),
-              width: 200,
-              height: 260,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-              ),
-
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailPage(productID: element.id)));
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 200,
-                      height: 170,
-                      padding: const EdgeInsets.all(10),
-                      child: Image(
-                        image: AssetImage(element.img),
-                        fit: BoxFit.contain,
-                      ),
+    if(produceList.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: produceList
+                .map(
+                  (element) =>
+                  Container(
+                    //margin: const EdgeInsets.symmetric(horizontal: 5),
+                    alignment: Alignment.center,
+                    //padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(top: 20, right: 10),
+                    width: 200,
+                    height: 260,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: Colors.white,
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 150),
-                      padding: const EdgeInsets.all(5),
-                      height: 260,
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
+
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailPage(productID: element)));
+                      },
+                      child: Stack(
                         children: [
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // name product
-                                  AutoSizeText(
-                                    element.name,
-                                    maxFontSize: 18,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-
-                                  // title product
-                                  AutoSizeText(
-                                    element.title,
-                                    maxFontSize: 12,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-
-                                  // Rate
-                                  RatingBar.builder(
-                                    ignoreGestures: true,
-                                    allowHalfRating: true,
-                                    initialRating: element.review,
-                                    itemSize: 15,
-                                    minRating: 0,
-                                    direction: Axis.horizontal,
-                                    itemCount: 5,
-                                    unratedColor: Colors.grey,
-                                    itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      //print(rating);
-                                    },
-                                  ),
-
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      AutoSizeText(
-                                        "(Sold ${element.sellest.toStringAsFixed(0)})",
-                                        maxFontSize: 12,
-                                        minFontSize: 12,
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                          ),
-                          Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1,color: const Color(0xff81220e)),
-                                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                  ),
-
-                                  child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
-                                ),
-                              ),
-                              const SizedBox(height: 20,),
-                              AutoSizeText(
-                                getDecorPrice(element.rootPrice),
-                                maxFontSize: 12,
-                                minFontSize: 12,
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey,
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 5,),
-                              AutoSizeText(
-                                getDecorPrice(element.currentPrice),
-                                maxFontSize: 15,
-                                minFontSize: 12,
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  color: Color(0xff80221e),
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Transform.rotate(angle: 380,
-                            child: SizedBox(
-                              height: 30,
-                              width: 60,
-                              child: CustomPaint(
-                                painter: PriceTagPaint(),
-                                child: Center(
-                                  child: Transform.rotate(angle: 380,child: Text(
-                                    returnDiscountPrice(element.rootPrice, element.currentPrice),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),),
-                                ),
-                              ),
+                          Container(
+                            width: 200,
+                            height: 170,
+                            padding: const EdgeInsets.all(10),
+                            child: FadeInImage(
+                              image: AssetImage(element.img),
+                              fit: BoxFit.contain,
+                              fadeInDuration: const Duration(
+                                  milliseconds: 2000),
+                              placeholder: const AssetImage(
+                                  "assets/icons/spinner170.gif"),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: getIconFavorite(
-                              element.id, listFavorite, element),
-                          onPressed: () {
-                            setState(() {
-                              var favorite = Favorite(
-                                imgProduct: element.img,
-                                nameProduct: element.name,
-                                idProduct: element.id,
-                                price: element.currentPrice,
-                              );
-
-                              handler.insertFavorite(favorite);
-                              handler.retrieveFavorites();
-                            });
-                          },
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          )
-              .toList(),
-        ),
-      ),
-    );
-  }
-  Widget getReviewProductList(List<Product> produceList, BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(left: 10,right: 10),
-      height: 300,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Wrap(
-          spacing: -1,
-          direction: Axis.vertical,
-          children: produceList
-              .map(
-                (element) => Container(
-              //margin: const EdgeInsets.symmetric(horizontal: 5),
-              alignment: Alignment.center,
-              //padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(top: 20,right: 10),
-              width: 200,
-              height: 260,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-              ),
-
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailPage(productID: element.id)));
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 200,
-                      height: 170,
-                      padding: const EdgeInsets.all(10),
-                      child: Image(
-                        image: AssetImage(element.img),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 150),
-                      padding: const EdgeInsets.all(5),
-                      height: 260,
-                      alignment: Alignment.bottomCenter,
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // name product
-                                  AutoSizeText(
-                                    element.name,
-                                    maxFontSize: 18,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-
-                                  // title product
-                                  AutoSizeText(
-                                    element.title,
-                                    maxFontSize: 12,
-                                    minFontSize: 12,
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: "Roboto",
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 2,
-                                  ),
-
-                                  // Rate
-                                  RatingBar.builder(
-                                    ignoreGestures: true,
-                                    allowHalfRating: true,
-                                    initialRating: element.review,
-                                    itemSize: 15,
-                                    minRating: 0,
-                                    direction: Axis.horizontal,
-                                    itemCount: 5,
-                                    unratedColor: Colors.grey,
-                                    itemPadding: const EdgeInsets.symmetric(horizontal: 1.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      //print(rating);
-                                    },
-                                  ),
-
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      AutoSizeText(
-                                        "(Sold ${element.sellest.toStringAsFixed(0)})",
-                                        maxFontSize: 12,
-                                        minFontSize: 12,
-                                        textAlign: TextAlign.start,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.normal,
+                          Container(
+                            margin: const EdgeInsets.only(top: 150),
+                            padding: const EdgeInsets.all(5),
+                            height: 260,
+                            alignment: Alignment.bottomCenter,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+                                      children: [
+                                        // name product
+                                        AutoSizeText(
+                                          element.name,
+                                          maxFontSize: 18,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+
+                                        // title product
+                                        AutoSizeText(
+                                          element.title,
+                                          maxFontSize: 12,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+
+                                        // Rate
+                                        RatingBar.builder(
+                                          ignoreGestures: true,
+                                          allowHalfRating: true,
+                                          initialRating: element.review,
+                                          itemSize: 15,
+                                          minRating: 0,
+                                          direction: Axis.horizontal,
+                                          itemCount: 5,
+                                          unratedColor: Colors.grey,
+                                          itemPadding: const EdgeInsets
+                                              .symmetric(horizontal: 1.0),
+                                          itemBuilder: (context, _) =>
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                                            //print(rating);
+                                          },
+                                        ),
+
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            AutoSizeText(
+                                              "(Sold ${element.sellest
+                                                  .toStringAsFixed(0)})",
+                                              maxFontSize: 12,
+                                              minFontSize: 12,
+                                              textAlign: TextAlign.start,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                ),
+                                Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(width: 1,
+                                              color: const Color(0xff81220e)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20)),
+                                        ),
+
+                                        child: const Icon(Icons.shopping_cart,
+                                          color: Color(0xff81220e), size: 25,),
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              )
+                                    ),
+                                    const SizedBox(height: 20,),
+                                    AutoSizeText(
+                                      getDecorPrice(element.rootPrice),
+                                      maxFontSize: 12,
+                                      minFontSize: 12,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.lineThrough,
+                                        color: Colors.grey,
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5,),
+                                    AutoSizeText(
+                                      getDecorPrice(element.currentPrice),
+                                      maxFontSize: 15,
+                                      minFontSize: 12,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Color(0xff80221e),
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          Column(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1,color: const Color(0xff81220e)),
-                                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                child: Transform.rotate(angle: 380,
+                                  child: SizedBox(
+                                    height: 30,
+                                    width: 60,
+                                    child: CustomPaint(
+                                      painter: PriceTagPaint(),
+                                      child: Center(
+                                        child: Transform.rotate(
+                                          angle: 380, child: Text(
+                                          returnDiscountPrice(element.rootPrice,
+                                              element.currentPrice),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),),
+                                      ),
+                                    ),
                                   ),
-
-                                  child: const Icon(Icons.shopping_cart , color: Color(0xff81220e),size: 25,),
                                 ),
                               ),
-                              const SizedBox(height: 20,),
-                              AutoSizeText(
-                                getDecorPrice(element.currentPrice),
-                                maxFontSize: 15,
-                                minFontSize: 12,
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  color: Color(0xff80221e),
-                                  fontFamily: "Roboto",
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              IconButton(
+                                icon: getIconFavorite(
+                                    element.id, listFavorite, element),
+                                onPressed: () {
+                                  setState(() {
+                                    var favorite = Favorite(
+                                      imgProduct: element.img,
+                                      nameProduct: element.name,
+                                      idProduct: element.id,
+                                      price: element.currentPrice,
+                                    );
 
+                                    handler.insertFavorite(favorite);
+                                    handler.retrieveFavorites();
+                                  });
+                                },
+                              ),
                             ],
-                          ),
+                          )
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(left: 5),
-                          width: 40,
-                          height: 40,
-                          alignment: Alignment.center,
-                          child: const Image(image: AssetImage("assets/icons/best.png"),fit: BoxFit.fill,),
-                        ),
-                        IconButton(
-                          icon: getIconFavorite(
-                              element.id, listFavorite, element),
-                          onPressed: () {
-                            setState(() {
-                              var favorite = Favorite(
-                                imgProduct: element.img,
-                                nameProduct: element.name,
-                                idProduct: element.id,
-                                price: element.currentPrice,
-                              );
-
-                              handler.insertFavorite(favorite);
-                              handler.retrieveFavorites();
-                            });
-                          },
-                        ),
-                      ],
-                    )
-                  ],
+                  ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
+    else {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: [1,2]
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                child: Center (
+                  child: Image.asset("assets/icons/spinner170.gif"),
                 ),
               ),
-            ),
-          )
-              .toList(),
+            )
+                .toList(),
+          ),
         ),
-      ),
-    );
+      );
+    }
+  }
+  Widget getReviewProductList(List<Product> produceList, BuildContext context) {
+    if(produceList.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: produceList
+                .map(
+                  (element) =>
+                  Container(
+                    //margin: const EdgeInsets.symmetric(horizontal: 5),
+                    alignment: Alignment.center,
+                    //padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(top: 20, right: 10),
+                    width: 200,
+                    height: 260,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: Colors.white,
+                    ),
+
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailPage(productID: element)));
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 200,
+                            height: 170,
+                            padding: const EdgeInsets.all(10),
+                            child: FadeInImage(
+                              image: AssetImage(element.img),
+                              fit: BoxFit.contain,
+                              placeholder: const AssetImage(
+                                  "assets/icons/spinner170.gif"),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 150),
+                            padding: const EdgeInsets.all(5),
+                            height: 260,
+                            alignment: Alignment.bottomCenter,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+                                      children: [
+                                        // name product
+                                        AutoSizeText(
+                                          element.name,
+                                          maxFontSize: 18,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+
+                                        // title product
+                                        AutoSizeText(
+                                          element.title,
+                                          maxFontSize: 12,
+                                          minFontSize: 12,
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+
+                                        // Rate
+                                        RatingBar.builder(
+                                          ignoreGestures: true,
+                                          allowHalfRating: true,
+                                          initialRating: element.review,
+                                          itemSize: 15,
+                                          minRating: 0,
+                                          direction: Axis.horizontal,
+                                          itemCount: 5,
+                                          unratedColor: Colors.grey,
+                                          itemPadding: const EdgeInsets
+                                              .symmetric(horizontal: 1.0),
+                                          itemBuilder: (context, _) =>
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                                            //print(rating);
+                                          },
+                                        ),
+
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            AutoSizeText(
+                                              "(Sold ${element.sellest
+                                                  .toStringAsFixed(0)})",
+                                              maxFontSize: 12,
+                                              minFontSize: 12,
+                                              textAlign: TextAlign.start,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: "Roboto",
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                ),
+                                Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(width: 1,
+                                              color: const Color(0xff81220e)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20)),
+                                        ),
+
+                                        child: const Icon(Icons.shopping_cart,
+                                          color: Color(0xff81220e), size: 25,),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20,),
+                                    AutoSizeText(
+                                      getDecorPrice(element.currentPrice),
+                                      maxFontSize: 15,
+                                      minFontSize: 12,
+                                      textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                        color: Color(0xff80221e),
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(left: 5),
+                                width: 40,
+                                height: 40,
+                                alignment: Alignment.center,
+                                child: const Image(
+                                  image: AssetImage("assets/icons/best.png"),
+                                  fit: BoxFit.fill,),
+                              ),
+                              IconButton(
+                                icon: getIconFavorite(
+                                    element.id, listFavorite, element),
+                                onPressed: () {
+                                  setState(() {
+                                    var favorite = Favorite(
+                                      imgProduct: element.img,
+                                      nameProduct: element.name,
+                                      idProduct: element.id,
+                                      price: element.currentPrice,
+                                    );
+
+                                    handler.insertFavorite(favorite);
+                                    handler.retrieveFavorites();
+                                  });
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
+    else {
+      return Container(
+        margin: const EdgeInsets.only(left: 10,right: 10),
+        height: 300,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            spacing: -1,
+            direction: Axis.vertical,
+            children: [1,2]
+                .map(
+                  (element) => Container(
+                //margin: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                //padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(top: 20,right: 10),
+                width: 200,
+                height: 260,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                child: Center (
+                  child: Image.asset("assets/icons/spinner170.gif"),
+                ),
+              ),
+            )
+                .toList(),
+          ),
+        ),
+      );
+    }
   }
 
   Widget getIconFavorite(
@@ -1341,22 +1511,6 @@ String returnDiscountPrice(double priceRoot, double priceCurrent) {
   return "${discount.toStringAsFixed(0)} % ";
 }
 
-extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  }
-
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toRadixString(16).padLeft(2, '0')}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
-}
 
 class Clipper extends CustomClipper<Path> {
   @override

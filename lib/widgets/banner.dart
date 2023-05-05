@@ -50,12 +50,17 @@ class _BannerWidgetState extends State<BannerWidget> {
             builder: (BuildContext context) {
               return Container(
                 margin: const EdgeInsets.all(6.0),
+                width: MediaQuery.of(context).size.width,
+                height: 180,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  image: DecorationImage(
-                    image: AssetImage(banner.imgURL),
-                    fit: BoxFit.fill,
-                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  child: Image(
+                image: AssetImage(banner.imgURL),
+                fit: BoxFit.fill,
+              ),
                 ),
               );
             },

@@ -54,6 +54,9 @@ dependencies:
   flutter_stripe: ^9.1.1
   shared_preferences: ^2.1.0
   flutter_rating_bar: ^4.0.1
+  image_picker: ^0.8.7+4
+  flutter_svg: ^2.0.5
+
 
 dev_dependencies:
   flutter_test:

@@ -36,7 +36,7 @@ class _WelcomState extends State<Welcom> {
         }
         else {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const Register()));
+              context, MaterialPageRoute(builder: (context) => const Login()));
         }
       }
       else

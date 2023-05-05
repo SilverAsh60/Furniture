@@ -121,11 +121,12 @@ class _LoginState extends State<Login> {
       Navigator.of(context).pop();
 
       var message = "Please Check Your Internet Connection ";
+
       if(error.code == "user-not-found") {
         message = "Information login is incorrectly";
       }
       else if(error.code == "network-request-failed") {
-       message = "Please Check Your Internet Connection";
+        message = "Please Check Your Internet Connection";
       }
       else if(error.code == "wrong-password"){
         message = "Password is incorrectly";
@@ -180,13 +181,9 @@ class _LoginState extends State<Login> {
 
       setState(() {
         isLoading = false;
-      });
+        });
 
-    }
-
-    setState(() {
-      isLoading = false;
-    });
+      }
   }
 
   void validation(BuildContext context) async {

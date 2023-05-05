@@ -10,6 +10,7 @@ class UserSQ extends Equatable {
   final String dateEnter;
   final String email;
   final String status;
+  final String gender;
 
   const UserSQ({
     required this.status,
@@ -21,6 +22,7 @@ class UserSQ extends Equatable {
     required this.birthDate,
     required this.idUser,
     required this.dateEnter,
+    required this.gender,
   });
 
   UserSQ.fromMap(Map<String, dynamic> user)
@@ -30,6 +32,7 @@ class UserSQ extends Equatable {
         fullName = user["fullName"],
         address = user["address"],
         img = user["img"],
+        gender = user['gender'],
         birthDate = user["birthDate"],
         dateEnter = user["dateEnter"],
         status = user["status"];
@@ -45,12 +48,13 @@ class UserSQ extends Equatable {
       'birthDate': birthDate,
       'dateEnter': dateEnter,
       'status': status,
+      'gender': gender,
     };
   }
 
   @override
   List<Object?> get props => [
-    status,
+        status,
         email,
         phone,
         fullName,
@@ -58,6 +62,7 @@ class UserSQ extends Equatable {
         img,
         birthDate,
         idUser,
-        dateEnter
+        dateEnter,
+        gender,
       ];
 }

@@ -5,7 +5,6 @@ import 'package:final_project_funiture_app/screens/verify.dart';
 import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/phone_model.dart';
 import '../models/user_model.dart';
@@ -51,140 +50,30 @@ class _RegisterState extends State<Register> {
   late DatabaseHandler handler;
 
 
-  void submit(BuildContext context) async {
+  void submit(context) async {
     UserCredential result;
-
     try {
-      setState(() {
-        isLoading = true;
-        isRegisterSuccessfull = false;
-        isWarning = false;
-        isError = false;
-        if (isLoading) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        // The loading indicator
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        // Some text
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
+      showDialog(
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    SizedBox(height: 20,),
+                    CircularProgressIndicator(color: Color(0xffecd8e0),),
+                    SizedBox(height: 20,),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
 
-          Timer(const Duration(milliseconds: 1000), () {
-            Navigator.pop(context);
-          });
-        }
-        else if (isRegisterSuccessfull) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
-                        // Some text
-                        Text('Register Successfully'),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
-            prefs.setBool('LOGIN', true);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Verify(phoneUser:  phone)));
-          });
-        }
-        else if (isWarning) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
-                        // Some text
-                        Text(messageWarning),
-                        ElevatedButton(onPressed: () {
-                          isWarning = false;
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else if (isError) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
-                        // Some text
-                        Text(messageError),
-                        ElevatedButton(onPressed: () {
-                          setState(() {
-                            isError = false;
-                            isLoading = false;
-                          });
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else {
-          Navigator.pop(context);
-        }
-      });
       result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: "${phoneNumber.text}@gmail.com", password: password.text);
 
@@ -196,6 +85,7 @@ class _RegisterState extends State<Register> {
           address: "",
           status: "INVALID",
           img: "",
+          gender: 'Male',
           birthDate: "",
           idUser: result.user!.uid,
           dateEnter: DateTime.now().toString());
@@ -204,407 +94,103 @@ class _RegisterState extends State<Register> {
           .doc(result.user!.uid)
           .set(newUser.toMap());
 
-      setState(() {
-        isLoading = false;
-        isRegisterSuccessfull = true;
-        isWarning = false;
-        isError = false;
+      Navigator.pop(context);
 
-        if (isLoading) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        // The loading indicator
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        // Some text
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Image(image: AssetImage("assets/icons/success.png"),width: 60,),
+                    // Some text
+                    SizedBox(height: 20,),
+                    Text("Register successfully",style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),),
+                    SizedBox(height: 20,),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
 
-          Timer(const Duration(milliseconds: 1000), () {
-            Navigator.pop(context);
-          });
-        }
-        else if (isRegisterSuccessfull) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
-                        // Some text
-                        Text('Register Successfully'),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
-            prefs.setBool('LOGIN', true);
-            handler.insertUser(newUser);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Verify(phoneUser:  phone)));
-          });
-        }
-        else if (isWarning) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
-                        // Some text
-                        Text(messageWarning),
-                        ElevatedButton(onPressed: () {
-                          isWarning = false;
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else if (isError) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
-                        // Some text
-                        Text(messageError),
-                        ElevatedButton(onPressed: () {
-                          setState(() {
-                            isError = false;
-                            isLoading = false;
-                          });
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else {
-          Navigator.pop(context);
-        }
+      Timer(const Duration(milliseconds: 1500), () {
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (ctx) => Verify(phoneUser: currentPhoneNumber.value + phoneNumber.text , idUser: result.user!.uid,)));
       });
-    } on PlatformException catch (error) {
+
+    } on FirebaseAuthException catch (error) {
+      Navigator.of(context).pop();
+
       var message = "Please Check Your Internet Connection ";
-      if (error.message != null) {
-        //print(error.message ?? '');
+
+      if(error.code == "email-already-in-use") {
+        message = "Phone is registered for another account";
       }
+      else if(error.code == "network-request-failed") {
+        message = "Please Check Your Internet Connection";
+      }
+
       setState(() {
         isLoading = false;
-        isRegisterSuccessfull = false;
-        isWarning = true;
-        isError = false;
-
-        messageWarning = message;
-
-        if (isLoading) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        // The loading indicator
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        // Some text
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            Navigator.pop(context);
-          });
-        }
-        else if (isRegisterSuccessfull) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
-                        // Some text
-                        Text('Register Successfully'),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Verify(phoneUser:  phone)));
-          });
-        }
-        else if (isWarning) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
-                        // Some text
-                        Text(messageWarning),
-                        ElevatedButton(onPressed: () {
-                          isWarning = false;
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else if (isError) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
-                        // Some text
-                        Text(messageError),
-                        ElevatedButton(onPressed: () {
-                          setState(() {
-                            isError = false;
-                            isLoading = false;
-                          });
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else {
-          Navigator.pop(context);
-        }
       });
-    } catch (error) {
-      setState(() {
-        isLoading = false;
-        isRegisterSuccessfull = false;
-        isWarning = false;
-        isError = true;
 
-        messageError = error.toString();
-
-        if (isLoading) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        // The loading indicator
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 15,
+      showDialog(
+          context: context,
+          builder: (_) {
+            return Dialog(
+              // The background color
+              backgroundColor: const Color(0xff560f20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
+                    // Some text
+                    const SizedBox(height: 20),
+                    Text(message,style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),),
+                    const SizedBox(height: 20,),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color> (const Color(0xffecd8e0)),
                         ),
-                        // Some text
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            Navigator.pop(context);
-          });
-        }
-        else if (isRegisterSuccessfull) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Image(image: AssetImage("assets/icons/success.png") , width: 60,),
-                        // Some text
-                        Text('Register Successfully'),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-
-          Timer(const Duration(milliseconds: 1000), () {
-            String phone = currentPhoneNumber.value + phoneNumber.text.toString();
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Verify(phoneUser:  phone)));
-          });
-        }
-        else if (isWarning) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/warning.png") , width: 60,),
-                        // Some text
-                        Text(messageWarning),
-                        ElevatedButton(onPressed: () {
-                          isWarning = false;
-                          Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else if (isError) {
-          showDialog(
-            // The user CANNOT close this dialog  by pressing outsite it
-              context: context,
-              builder: (_) {
-                return Dialog(
-                  // The background color
-                  backgroundColor: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Image(image: AssetImage("assets/icons/cancel.png"),width: 60,),
-                        // Some text
-                        Text(messageError),
-                        ElevatedButton(onPressed: () {
+                        onPressed: () {
                           setState(() {
                             isError = false;
                             isLoading = false;
                           });
                           Navigator.pop(context);
-                        }, child: const Text('OK')),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          );
-        }
-        else {
-          Navigator.pop(context);
-        }
+                        }, child: const Text('OK' , style: TextStyle(
+                      color: Color(0xff560f20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),)),
+                  ],
+                ),
+              ),
+            );
+          }
+      );
+
+    } catch (error) {
+      Navigator.of(context).pop();
+
+      setState(() {
+        isLoading = false;
       });
     }
   }

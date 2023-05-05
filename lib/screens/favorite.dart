@@ -84,7 +84,7 @@ class _FavoritePageState extends State<FavoritePage> {
                     },
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailPage(productID: snapshot.data![index].idProduct)));
+                        //Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailPage(productID: snapshot.data![index])));
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width,

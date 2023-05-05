@@ -38,6 +38,7 @@ class DatabaseHandler {
             "birthDate TEXT NOT NULL,"
             "dateEnter TEXT NOT NULL,"
             "status TEXT NOT NULL,"
+            "gender TEXT NOT NULL,"
             "email TEXT NOT NULL)");
       },
       version: 1,
@@ -50,7 +51,28 @@ class DatabaseHandler {
   Future<int> insertCart(Cart cart) async {
     int result = 0;
     final Database db = await initializeDB();
-    result = await db.insert('Cart', cart.toMap());
+    List<Cart> listOldCart = getListCart;
+    int? idCart = -1;
+    int quantity = 0;
+    for(var ca in listOldCart) {
+      if(ca.idProduct == cart.idProduct) {
+        idCart = ca.idCart;
+        quantity = ca.quantity;
+        break;
+      }
+    }
+
+    if(idCart == -1) {
+      result = await db.insert('Cart', cart.toMap());
+    }
+    else {
+      result = await db.update(
+        'Cart',
+        {'quantity': quantity + 1},
+        where: 'idCart = ?',
+        whereArgs: [idCart],
+      );
+    }
     return result;
   }
 
