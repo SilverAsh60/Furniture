@@ -1,9 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="hcmute.edu.vn.final_project_funiture_app">
-
+    package="hcmute.edu.vn.furniture_app_project">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="final_project_funiture_app"
+        android:label="furniture_app_project"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -22,6 +21,9 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data
+                android:name="com.tekartik.sqflite.wal_enabled"
+                android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

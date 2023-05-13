@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project_funiture_app/screens/login.dart';
-import 'package:final_project_funiture_app/screens/verify.dart';
-import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
+import '../screens/login.dart';
+import '../screens/verify.dart';
+import '../services/DatabaseHandler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,6 +76,9 @@ class _RegisterState extends State<Register> {
 
       result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: "${phoneNumber.text}@gmail.com", password: password.text);
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("idUser", result.user!.uid);
 
       //print(result);
       UserSQ newUser = UserSQ(
@@ -255,9 +258,11 @@ class _RegisterState extends State<Register> {
       resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
       body: Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom / 2,
+        ),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        padding: const EdgeInsets.all(0),
         decoration: const BoxDecoration(
             image: DecorationImage(
           image: AssetImage("assets/images/background_register.jpg"),

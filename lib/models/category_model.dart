@@ -1,39 +1,36 @@
-class Category {
+import 'package:equatable/equatable.dart';
+
+class Category extends Equatable{
+  final String img;
+  final String name;
+  final String id;
+  final String status;
+  final List<CategoryItem> itemList;
+
+  const Category(
+      {required this.img,
+      required this.name,
+      required this.id,
+        required this.itemList,
+      required this.status});
+
+  @override
+  List<Object?> get props => [img,name,id,status,itemList];
+
+}
+
+class CategoryItem extends Equatable{
   final String img;
   final String name;
   final String id;
   final String status;
 
-  Category(
+  const CategoryItem(
       {required this.img,
-      required this.name,
-      required this.id,
-      required this.status});
+        required this.name,
+        required this.id,
+        required this.status});
 
-  /*
-  Category.fromJson(Map<String, Object?> json)
-      : this(
-    id: json['id']! as String,
-    img: json['img']! as String,
-    name: json['name']! as String,
-    status: json['status']! as String,
-  );
-
-  Map<String, Object?> toJson() {
-    return {
-      'id': id,
-      'img': img,
-      'name':name,
-      'status':status,
-    };
-  }
-
-  factory Category.fromMap(Map data) {
-    return Category(
-      id: data['id'],
-      img: data['img'],
-      name: data['name'],
-      status: data['status'],
-    );
-  }*/
+  @override
+  List<Object?> get props => [img,name,id,status];
 }

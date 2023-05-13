@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:final_project_funiture_app/screens/home.dart';
-import 'package:final_project_funiture_app/screens/introduce.dart';
-import 'package:final_project_funiture_app/screens/login.dart';
-import 'package:final_project_funiture_app/screens/register.dart';
+import '../screens/home.dart';
+import '../screens/introduce.dart';
+import '../screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-class Order extends Equatable {
+import 'cart_model.dart';
+
+class OrderModel extends Equatable {
   final String idOrder;
   final String fullName;
   final String phone;
@@ -17,8 +19,10 @@ class Order extends Equatable {
   final double totalOrder;
   final String statusOrder;
   final String idUser;
+  final List<Cart> cartList;
 
-  const Order({
+  const OrderModel({
+    required this.cartList,
     required this.idUser,
     required this.paymentMethod,
     required this.fullName,
@@ -39,6 +43,7 @@ class Order extends Equatable {
 
   @override
   List<Object?> get props => [
+    cartList,
     idUser,
     paymentMethod,
     fullName,

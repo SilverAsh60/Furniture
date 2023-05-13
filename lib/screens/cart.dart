@@ -1,5 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:final_project_funiture_app/screens/checkout.dart';
+import '../screens/checkout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,56 +60,57 @@ class _CartPageState extends State<CartPage> {
           )
         ],
       ),
-      body: FutureBuilder(
-        future: handler.retrieveCarts(),
-        builder: (BuildContext context, AsyncSnapshot<List<Cart>> snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-                itemCount: snapshot.data?.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Dismissible(
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      color: const Color(0xfff2f9fe),
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: const Icon(Icons.delete_forever),
+      body: listCart.isNotEmpty ? ListView.builder(
+          itemCount: listCart.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Dismissible(
+              direction: DismissDirection.endToStart,
+              background: Container(
+                color: const Color(0xfff2f9fe),
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: const Icon(Icons.delete_forever),
+              ),
+              key: ValueKey<int>(listCart[index].idCart!),
+              onDismissed: (DismissDirection direction) async {
+                try {
+                  await handler.deleteCart(listCart[index].idCart!);
+                  setState(() {
+                    listCart.remove(listCart[index]);
+                  });
+                }
+                catch (e) {
+                  print(e);
+                }
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 100,
+                alignment: Alignment.center,
+                margin: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(179, 213, 242, 0.2),
+                      spreadRadius: 5,
+                      blurRadius: 3,
                     ),
-                    key: ValueKey<int>(snapshot.data![index].idCart!),
-                    onDismissed: (DismissDirection direction) async {
-                      await handler.deleteCart(snapshot.data![index].idCart!);
-                      // setState(() {
-                      //   snapshot.data!.remove(snapshot.data![index]);
-                      // });
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 100,
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(179, 213, 242, 0.2),
-                            spreadRadius: 5,
-                            blurRadius: 3,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              /*FadeInImage(
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        /*FadeInImage(
                                 image: NetworkImage(snapshot.data![index].imgProduct
                                     ),
                                 width: 90,
@@ -117,116 +118,116 @@ class _CartPageState extends State<CartPage> {
                                   "assets/images/logo.png"),
                               ),*/
 
-                              Image(image: AssetImage(
-                                  snapshot.data![index].imgProduct),width: 90,
-                                  height: 90)
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 4,
-                            alignment: Alignment.topLeft,
-                            height: 80,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  snapshot.data![index].nameProduct,
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  snapshot.data![index].color,
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  accumPrice(snapshot.data![index].price,
-                                      snapshot.data![index].quantity),
-                                  style: const TextStyle(
-                                    color: Color(0xff5e1414),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                        Image(image: AssetImage(
+                            listCart[index].imgProduct),width: 90,
+                            height: 90)
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 4,
+                      alignment: Alignment.topLeft,
+                      height: 80,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            listCart[index].nameProduct,
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      updateDownQuantity(
-                                          snapshot.data![index].idCart!,
-                                          snapshot.data![index].quantity);
-                                    });
-                                  },
-                                  icon: const Icon(
-                                    Icons.remove,
-                                    color: Colors.black,
-                                  )),
-                              Container(
-                                width: 40,
-                                height: 40,
-                                alignment: Alignment.center,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xff5e1414),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: Text(
-                                  snapshot.data![index].quantity.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              listCart[index].color,
+                              textAlign: TextAlign.left,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal,
                               ),
-                              IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      updateUpQuantity(
-                                          snapshot.data![index].idCart!,
-                                          snapshot.data![index].quantity);
-                                    });
-                                  },
-                                  icon: const Icon(Icons.add,
-                                      color: Colors.black)),
-                            ],
-                          )
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            accumPrice(listCart[index].price,
+                                listCart[index].quantity),
+                            style: const TextStyle(
+                              color: Color(0xff5e1414),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  );
-                });
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      bottomNavigationBar: getFooter(),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                updateDownQuantity(
+                                    listCart[index].idCart!,
+                                    listCart[index].quantity);
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.remove,
+                              color: Colors.black,
+                            )),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: Color(0xff5e1414),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Text(
+                            listCart[index].quantity.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                updateUpQuantity(
+                                    listCart[index].idCart!,
+                                    listCart[index].quantity);
+                              });
+                            },
+                            icon: const Icon(Icons.add,
+                                color: Colors.black)),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            );
+          }) : const Center(child: CircularProgressIndicator(),),
+      bottomNavigationBar: listCart.isNotEmpty ? getFooter(): Container(height: 0,),
     );
   }
 
   Widget getFooter() {
     return Container(
-      height: MediaQuery.of(context).size.height / 3.5,
+      height: MediaQuery.of(context).size.height / 3,
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -338,7 +339,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                   child: const Text('Checkout' , style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 18,
                   ),),
                 ),
               ),
@@ -370,7 +371,9 @@ class _CartPageState extends State<CartPage> {
       total += element.quantity * element.price;
     }
 
-    return "\$ $total";
+    String finalText = total.toStringAsFixed(2);
+
+    return "\$ $finalText";
   }
 
   void updateUpQuantity(int idCart, int quantity) {

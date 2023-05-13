@@ -1,11 +1,16 @@
-import 'package:final_project_funiture_app/provider/banner_provider.dart';
-import 'package:final_project_funiture_app/provider/category_provider.dart';
-import 'package:final_project_funiture_app/provider/country_city_provider.dart';
-import 'package:final_project_funiture_app/provider/order_provider.dart';
-import 'package:final_project_funiture_app/provider/product_provider.dart';
-import 'package:final_project_funiture_app/provider/user_provider.dart';
-import 'package:final_project_funiture_app/screens/home.dart';
-import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
+import 'package:furniture_app_project/provider/filter_provider.dart';
+import 'package:furniture_app_project/screens/introduce.dart';
+import 'package:furniture_app_project/screens/profile.dart';
+import 'package:furniture_app_project/screens/welcome.dart';
+
+import 'provider/banner_provider.dart';
+import 'provider/category_provider.dart';
+import 'provider/country_city_provider.dart';
+import 'provider/order_provider.dart';
+import 'provider/product_provider.dart';
+import 'provider/user_provider.dart';
+import 'screens/home.dart';
+import 'services/DatabaseHandler.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +52,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserProvider>(
           create: (context) => UserProvider(),
         ),
+        ChangeNotifierProvider<FilterProvider>(
+          create: (context) => FilterProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Furniture App',
@@ -65,7 +73,7 @@ class MyApp extends StatelessWidget {
 
         ),
         debugShowCheckedModeBanner: false,
-        home: const HomePage(),
+        home: const Welcom(),
       ),
     );
   }

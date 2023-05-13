@@ -1,9 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:final_project_funiture_app/models/favorite_model.dart';
-import 'package:final_project_funiture_app/models/user_model.dart';
-import 'package:final_project_funiture_app/provider/user_provider.dart';
-import 'package:final_project_funiture_app/screens/cart.dart';
+import '../models/favorite_model.dart';
+import '../models/user_model.dart';
+import '../provider/user_provider.dart';
+import '../screens/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
@@ -377,7 +377,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                       idProduct: productItem.id,
                       price: widget.productID.currentPrice);
                   handler.insertFavorite(fav);
-                  handler.retrieveCarts();
                 },
                 child: Container(
                     width: 50,
@@ -399,8 +398,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               left: MediaQuery.of(context).size.width / 4 - 25,
               child: GestureDetector(
                 onTap: () {
-                  handler.insertCart(cart);
-                  handler.retrieveCarts();
+                  var cartNew = Cart(
+                      imgProduct: productItem.img[0],
+                      nameProduct: widget.productID.name,
+                      color: productItem.color.values.elementAt(0),
+                      quantity: 1, idProduct: widget.productID.id, price:widget.productID.currentPrice
+                  );
+
+                  handler.insertCart(cartNew);
+                  //handler.retrieveCarts();
                 },
                 child: Container(
                     width: 50,

@@ -27,7 +27,7 @@ class _VerifyState extends State<Verify> {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.only(top: 20 , bottom: MediaQuery.of(context).viewInsets.bottom / 2,),
         decoration: const BoxDecoration(
           color: Color(0xff410000),
         ),
@@ -599,13 +599,12 @@ class _VerifyState extends State<Verify> {
             );
           }
       );
-      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential).then((value) async => await FirebaseFirestore.instance.collection('user').doc(widget.idUser).set({'status' : 'VALID' }));
+      //await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential).then((value) async => await FirebaseFirestore.instance.collection('user').doc(widget.idUser).set({'status' : 'VALID' }));
       setState(() {
         status += 'Signed In\n';
         verifyTr = true;
         page = 2;
       });
-      
       
 
       if (kDebugMode) {

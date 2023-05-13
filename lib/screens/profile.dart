@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project_funiture_app/screens/home.dart';
-import 'package:final_project_funiture_app/widgets/mybutton.dart';
-import 'package:final_project_funiture_app/widgets/mytextformField.dart';
-import 'package:final_project_funiture_app/models/user_model.dart';
+import '../screens/home.dart';
+import '../widgets/mybutton.dart';
+import '../widgets/mytextformField.dart';
+import '../models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:final_project_funiture_app/widgets/bottom_navy_bar.dart';
+import '../widgets/bottom_navy_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -70,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  String? userUid;
+  String userUid = 'AIA1EwLcVsgeCT5FOfceJr4yLNg1';
 
   var imageMap;
 
@@ -94,8 +94,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void getUserUid() {
-    User? myUser = FirebaseAuth.instance.currentUser;
-    userUid = myUser!.uid;
+    //User? myUser = FirebaseAuth.instance.currentUser;
+    //userUid = myUser!.uid;
+    userUid = 'AIA1EwLcVsgeCT5FOfceJr4yLNg1';
   }
 
   bool centerCircle = false;
@@ -122,7 +123,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSingleContainer(
-      {required Color color,
+      {
+        required Color color,
         required String startText,
         required String endText}) {
     return Card(
@@ -335,7 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           StreamBuilder(
               stream: FirebaseFirestore.instance
-                  .collection("User")
+                  .collection("user")
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -345,18 +347,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
                 var myDoc = snapshot.data!.docs;
                 for (var checkDocs in myDoc) {
-                  if (checkDocs.data()["UserId"] == userUid) {
+                  if (checkDocs.data()["idUser"] == userUid) {
                     userModel = UserSQ(
                       idUser: checkDocs.reference.id,
-                      email: checkDocs.data()["UserEmail"],
-                      img: checkDocs.data()["UserImage"],
-                      address: checkDocs.data()["UserAddress"],
-                      gender: checkDocs.data()["UserGender"],
-                      fullName: checkDocs.data()["UserName"],
-                      phone: checkDocs.data()["UserNumber"],
-                      dateEnter: checkDocs.data()['dateEnter'],
-                      status: checkDocs.data()['status'],
-                      birthDate: checkDocs.data()['birthDate'],
+                      email: checkDocs.data()["email"],
+                      img: checkDocs.data()["img"],
+                      address: checkDocs.data()["address"],
+                      gender: checkDocs.data()["gender"],
+                      fullName: checkDocs.data()["fullName"],
+                      phone: checkDocs.data()["phone"],
+                      dateEnter: checkDocs.data()["dateEnter"],
+                      status: checkDocs.data()["status"],
+                      birthDate: checkDocs.data()["birthDate"],
                     );
                   }
                 }
@@ -465,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : const Center(
         child: CircularProgressIndicator(),
       ),
-      bottomNavigationBar: getFooter(5, context),
+      bottomNavigationBar: getFooter(4, context),
     );
   }
 }

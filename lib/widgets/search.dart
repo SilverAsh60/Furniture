@@ -1,12 +1,12 @@
-import 'package:final_project_funiture_app/screens/search.dart';
+import '../screens/search.dart';
 import 'package:flutter/material.dart';
 
 Widget searchField(BuildContext context) {
   return Expanded(
     child: GestureDetector(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const Search()));
-        },
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const Search()));
+      },
       child: Container(
         height: 40,
         decoration: BoxDecoration(

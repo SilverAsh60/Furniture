@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project_funiture_app/models/product_model.dart';
+import '../models/product_model.dart';
 import 'package:flutter/material.dart';
 
 class ProductProvider with ChangeNotifier {
@@ -11,7 +11,7 @@ class ProductProvider with ChangeNotifier {
   List<Product> listReview = [];
   List<Product> listDiscount = [];
   List<Product> listProductByName = [];
-  Product productCurrent = const Product(name: '', img: '', id: '', description: '', rootPrice: 0, currentPrice: 0, categoryItemId: '', status: '', material: {}, size: {}, review: 0, sellest: 0, title: '', productItemList: [], reviewList: []);
+  Product productCurrent = Product(name: '', img: '', id: '', description: '', rootPrice: 0, currentPrice: 0, categoryItemId: '', status: '', material: const {}, size: const {}, review: 0, sellest: 0, title: '', productItemList: const [], reviewList: const [], timestamp: DateTime.now());
   String id ='';
 
   // Get All Product
@@ -27,8 +27,8 @@ class ProductProvider with ChangeNotifier {
       List<ProductItem> proItemList = [];
       List<Review> reList = [];
 
-      QuerySnapshot productItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
-      for(var pro in productItemSnaphot.docs) {
+      QuerySnapshot productItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
+      for(var pro in productItemSnapshot.docs) {
         var proItem = ProductItem(
           id: pro.reference.id,
           color: Map.from(pro['color']),
@@ -39,9 +39,9 @@ class ProductProvider with ChangeNotifier {
       }
       listProductItem = proItemList;
 
-      QuerySnapshot reviewItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
+      QuerySnapshot reviewItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
 
-      for(var re in reviewItemSnaphot.docs) {
+      for(var re in reviewItemSnapshot.docs) {
         DateTime dt = (re['timestamp'] as Timestamp).toDate();
         var review = Review(
           id: re.reference.id,
@@ -58,6 +58,7 @@ class ProductProvider with ChangeNotifier {
 
       listReviewItem = reList;
 
+      DateTime dtPro = (doc['timestamp'] as Timestamp).toDate();
       var product = Product(
         img: doc["img"],
         name: doc["name"],
@@ -74,6 +75,7 @@ class ProductProvider with ChangeNotifier {
         title: doc['title'],
         productItemList: proItemList,
         reviewList: reList,
+        timestamp: dtPro,
       );
       newList.add(product);
 
@@ -100,8 +102,8 @@ class ProductProvider with ChangeNotifier {
       List<ProductItem> proItemList = [];
       List<Review> reList = [];
 
-      QuerySnapshot productItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
-      for(var pro in productItemSnaphot.docs) {
+      QuerySnapshot productItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
+      for(var pro in productItemSnapshot.docs) {
         var proItem = ProductItem(
           id: pro.reference.id,
           color: Map.from(pro['color']),
@@ -112,9 +114,9 @@ class ProductProvider with ChangeNotifier {
       }
       listProductItem = proItemList;
 
-      QuerySnapshot reviewItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
+      QuerySnapshot reviewItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
 
-      for(var re in reviewItemSnaphot.docs) {
+      for(var re in reviewItemSnapshot.docs) {
         DateTime dt = (re['timestamp'] as Timestamp).toDate();
         var review = Review(
           id: re.reference.id,
@@ -131,6 +133,7 @@ class ProductProvider with ChangeNotifier {
 
       listReviewItem = reList;
 
+      DateTime dtPro = (doc['timestamp'] as Timestamp).toDate();
       var product = Product(
         img: doc["img"],
         name: doc["name"],
@@ -147,6 +150,7 @@ class ProductProvider with ChangeNotifier {
         title: doc['title'],
         productItemList: proItemList,
         reviewList: reList,
+        timestamp: dtPro,
       );
       newList.add(product);
     }
@@ -167,8 +171,8 @@ class ProductProvider with ChangeNotifier {
       List<ProductItem> proItemList = [];
       List<Review> reList = [];
 
-      QuerySnapshot productItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
-      for(var pro in productItemSnaphot.docs) {
+      QuerySnapshot productItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
+      for(var pro in productItemSnapshot.docs) {
         var proItem = ProductItem(
           id: pro.reference.id,
           color: Map.from(pro['color']),
@@ -179,9 +183,9 @@ class ProductProvider with ChangeNotifier {
       }
       listProductItem = proItemList;
 
-      QuerySnapshot reviewItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
+      QuerySnapshot reviewItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
 
-      for(var re in reviewItemSnaphot.docs) {
+      for(var re in reviewItemSnapshot.docs) {
         DateTime dt = (re['timestamp'] as Timestamp).toDate();
         var review = Review(
           id: re.reference.id,
@@ -198,6 +202,7 @@ class ProductProvider with ChangeNotifier {
 
       listReviewItem = reList;
 
+      DateTime dtPro = (doc['timestamp'] as Timestamp).toDate();
       var product = Product(
         img: doc["img"],
         name: doc["name"],
@@ -214,6 +219,7 @@ class ProductProvider with ChangeNotifier {
         title: doc['title'],
         productItemList: proItemList,
         reviewList: reList,
+        timestamp: dtPro,
       );
       newList.add(product);
     }
@@ -234,8 +240,8 @@ class ProductProvider with ChangeNotifier {
       List<ProductItem> proItemList = [];
       List<Review> reList = [];
 
-      QuerySnapshot productItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
-      for(var pro in productItemSnaphot.docs) {
+      QuerySnapshot productItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
+      for(var pro in productItemSnapshot.docs) {
         var proItem = ProductItem(
           id: pro.reference.id,
           color: Map.from(pro['color']),
@@ -246,9 +252,9 @@ class ProductProvider with ChangeNotifier {
       }
       listProductItem = proItemList;
 
-      QuerySnapshot reviewItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
+      QuerySnapshot reviewItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
 
-      for(var re in reviewItemSnaphot.docs) {
+      for(var re in reviewItemSnapshot.docs) {
         DateTime dt = (re['timestamp'] as Timestamp).toDate();
         var review = Review(
           id: re.reference.id,
@@ -265,6 +271,7 @@ class ProductProvider with ChangeNotifier {
 
       listReviewItem = reList;
 
+      DateTime dtPro = (doc['timestamp'] as Timestamp).toDate();
       var product = Product(
         img: doc["img"],
         name: doc["name"],
@@ -281,6 +288,7 @@ class ProductProvider with ChangeNotifier {
         title: doc['title'],
         productItemList: proItemList,
         reviewList: reList,
+        timestamp: dtPro,
       );
       newList.add(product);
     }
@@ -338,7 +346,7 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getProductbyID(String id) async {
+  Future<void> getProductByID(String id) async {
 
     DocumentSnapshot productSnapshot =
     await FirebaseFirestore.instance.collection("product").doc(id).get();
@@ -346,6 +354,7 @@ class ProductProvider with ChangeNotifier {
     getProductItem(productSnapshot.reference.id);
     getProductItem(productSnapshot.reference.id);
 
+    DateTime dtPro = (productSnapshot['timestamp'] as Timestamp).toDate();
     var product = Product(
       img: productSnapshot["img"],
       name: productSnapshot["name"],
@@ -362,6 +371,7 @@ class ProductProvider with ChangeNotifier {
       title: productSnapshot['title'],
       productItemList: getListProductItem,
       reviewList: getListReviewProductItem,
+      timestamp: dtPro,
     );
     productCurrent = product;
     notifyListeners();
@@ -378,8 +388,8 @@ class ProductProvider with ChangeNotifier {
       List<ProductItem> proItemList = [];
       List<Review> reList = [];
 
-      QuerySnapshot productItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
-      for(var pro in productItemSnaphot.docs) {
+      QuerySnapshot productItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('product-item').get();
+      for(var pro in productItemSnapshot.docs) {
         var proItem = ProductItem(
           id: pro.reference.id,
           color: Map.from(pro['color']),
@@ -390,9 +400,9 @@ class ProductProvider with ChangeNotifier {
       }
       listProductItem = proItemList;
 
-      QuerySnapshot reviewItemSnaphot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
+      QuerySnapshot reviewItemSnapshot = await FirebaseFirestore.instance.collection('product').doc(doc.reference.id).collection('review').get();
 
-      for(var re in reviewItemSnaphot.docs) {
+      for(var re in reviewItemSnapshot.docs) {
         DateTime dt = (re['timestamp'] as Timestamp).toDate();
         var review = Review(
           id: re.reference.id,
@@ -409,6 +419,7 @@ class ProductProvider with ChangeNotifier {
 
       listReviewItem = reList;
 
+      DateTime dtPro = (doc['timestamp'] as Timestamp).toDate();
       var product = Product(
         img: doc["img"],
         name: doc["name"],
@@ -425,6 +436,7 @@ class ProductProvider with ChangeNotifier {
         title: doc['title'],
         productItemList: proItemList,
         reviewList: reList,
+        timestamp: dtPro,
       );
       newList.add(product);
     }
@@ -455,7 +467,6 @@ class ProductProvider with ChangeNotifier {
   }
 
   Product get getProductCurrent {
-    //getProductbyID(id);
     return productCurrent;
   }
 

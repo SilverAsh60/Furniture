@@ -1,3 +1,4 @@
+import 'package:furniture_app_project/models/history_search_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -13,21 +14,21 @@ class DatabaseHandler {
       onCreate: (database, version) async {
         await database.execute(
           "CREATE TABLE Cart("
-          "idCart INTEGER PRIMARY KEY AUTOINCREMENT,"
-          "nameProduct TEXT NOT NULL,"
-          "color TEXT NOT NULL,"
-          "imgProduct TEXT NOT NULL,"
-          "idProduct TEXT NOT NULL,"
-          "quantity INTEGER NOT NULL, "
-          "price REAL NOT NULL)",
+              "idCart INTEGER PRIMARY KEY AUTOINCREMENT,"
+              "nameProduct TEXT NOT NULL,"
+              "color TEXT NOT NULL,"
+              "imgProduct TEXT NOT NULL,"
+              "idProduct TEXT NOT NULL,"
+              "quantity INTEGER NOT NULL, "
+              "price REAL NOT NULL)",
         );
         await database.execute(
           "CREATE TABLE Favorite("
-          "idFavorite INTEGER PRIMARY KEY AUTOINCREMENT,"
-          "nameProduct TEXT NOT NULL,"
-          "imgProduct TEXT NOT NULL,"
-          "idProduct TEXT NOT NULL,"
-          "price REAL NOT NULL)",
+              "idFavorite INTEGER PRIMARY KEY AUTOINCREMENT,"
+              "nameProduct TEXT NOT NULL,"
+              "imgProduct TEXT NOT NULL,"
+              "idProduct TEXT NOT NULL,"
+              "price REAL NOT NULL)",
         );
         await database.execute("CREATE TABLE UserSQ("
             "idUser TEXT PRIMARY KEY NOT NULL,"
@@ -39,7 +40,12 @@ class DatabaseHandler {
             "dateEnter TEXT NOT NULL,"
             "status TEXT NOT NULL,"
             "gender TEXT NOT NULL,"
-            "email TEXT NOT NULL)");
+            "email TEXT NOT NULL)"
+        );
+        await database.execute("CREATE TABLE History("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "name TEXT NOT NULL)"
+        );
       },
       version: 1,
     );
@@ -47,6 +53,43 @@ class DatabaseHandler {
 
   // Card Method
   List<Cart> listCart = [];
+  List<Favorite> listFavorite = [];
+  List<UserSQ> listUser = [];
+  List<HistorySearch> listHistorySearch = [];
+
+  Future<void> retrieveCarts() async {
+    final Database db = await initializeDB();
+    await db.transaction((txn) async {
+      final List<Map<String, Object?>> queryResult = await txn.query('Cart');
+      listCart = queryResult.map((e) => Cart.fromMap(e)).toList();
+    });
+    //return queryResult.map((e) => Cart.fromMap(e)).toList();
+  }
+  Future<void> retrieveUser() async {
+    final Database db = await initializeDB();
+    await db.transaction((txn) async {
+      final List<Map<String, Object?>> queryResult = await txn.query('UserSQ');
+      listUser = queryResult.map((e) => UserSQ.fromMap(e)).toList();
+    });
+    //return queryResult.map((e) => UserSQ.fromMap(e)).toList();
+  }
+  Future<void> retrieveFavorites() async {
+    final Database db = await initializeDB();
+    await db.transaction((txn) async {
+      final List<Map<String, Object?>> queryResult = await txn.query(
+          'Favorite');
+      listFavorite = queryResult.map((e) => Favorite.fromMap(e)).toList();
+    });
+    //return queryResult.map((e) => Favorite.fromMap(e)).toList();
+  }
+  Future<void> retrieveHisSearch() async {
+    final Database db = await initializeDB();
+    await db.transaction((txn) async {
+      final List<Map<String, Object?>> queryResult = await txn.query('History');
+      listHistorySearch = queryResult.map((e) => HistorySearch.fromMap(e)).toList();
+    });
+    //return queryResult.map((e) => Cart.fromMap(e)).toList();
+  }
 
   Future<int> insertCart(Cart cart) async {
     int result = 0;
@@ -54,6 +97,7 @@ class DatabaseHandler {
     List<Cart> listOldCart = getListCart;
     int? idCart = -1;
     int quantity = 0;
+
     for(var ca in listOldCart) {
       if(ca.idProduct == cart.idProduct) {
         idCart = ca.idCart;
@@ -75,14 +119,6 @@ class DatabaseHandler {
     }
     return result;
   }
-
-  Future<List<Cart>> retrieveCarts() async {
-    final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult = await db.query('Cart');
-    listCart = queryResult.map((e) => Cart.fromMap(e)).toList();
-    return queryResult.map((e) => Cart.fromMap(e)).toList();
-  }
-
   Future<void> deleteCart(int idCart) async {
     final db = await initializeDB();
     await db.delete(
@@ -91,12 +127,6 @@ class DatabaseHandler {
       whereArgs: [idCart],
     );
   }
-
-  List<Cart> get getListCart {
-    retrieveCarts();
-    return listCart;
-  }
-
   Future<void> updateCart(int idCart, int quantity) async {
     final db = await initializeDB();
     await db.update(
@@ -106,53 +136,39 @@ class DatabaseHandler {
       whereArgs: [idCart],
     );
   }
-
-  // Favorite Method
-  List<Favorite> listFavorite = [];
   Future<int> insertFavorite(Favorite favorite) async {
     int result = 0;
     final Database db = await initializeDB();
-    result = await db.insert('Favorite', favorite.toMap());
+    List<Favorite> favoriteList = getListFavorite;
+    favoriteList = favoriteList.where((element) => element.idProduct == favorite.idProduct).toList();
+
+    if(favoriteList.isNotEmpty) {
+      deleteFavorite(favoriteList[0].idFavorite!);
+    }
+    else {
+      await db.transaction((txn) async {
+        result = await txn.insert('Favorite', favorite.toMap());
+      });
+    }
     return result;
   }
-
-  Future<List<Favorite>> retrieveFavorites() async {
-    final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult = await db.query('Favorite');
-    listFavorite = queryResult.map((e) => Favorite.fromMap(e)).toList();
-    return queryResult.map((e) => Favorite.fromMap(e)).toList();
-  }
-
   Future<void> deleteFavorite(int idFavorite) async {
     final db = await initializeDB();
-    await db.delete(
-      'Favorite',
-      where: "idFavorite = ?",
-      whereArgs: [idFavorite],
-    );
+    await db.transaction((txn) async {
+      await txn.delete(
+        'Favorite',
+        where: "idFavorite = ?",
+        whereArgs: [idFavorite],
+      );
+    });
   }
-
-  List<Favorite> get getListFavorite {
-    retrieveFavorites();
-    return listFavorite;
-  }
-
   // User method
-  List<UserSQ> listUser = [];
   Future<int> insertUser(UserSQ user) async {
     int result = 0;
     final Database db = await initializeDB();
     result = await db.insert('UserSQ', user.toMap());
     return result;
   }
-
-  Future<List<UserSQ>> retrieveUser() async {
-    final Database db = await initializeDB();
-    final List<Map<String, Object?>> queryResult = await db.query('UserSQ');
-    listUser = queryResult.map((e) => UserSQ.fromMap(e)).toList();
-    return queryResult.map((e) => UserSQ.fromMap(e)).toList();
-  }
-
   Future<void> deleteUser(int idUser) async {
     final db = await initializeDB();
     await db.delete(
@@ -165,5 +181,17 @@ class DatabaseHandler {
   List<UserSQ> get getListUser {
     retrieveUser();
     return listUser;
+  }
+  List<Cart> get getListCart {
+    retrieveCarts();
+    return listCart;
+  }
+  List<Favorite> get getListFavorite {
+    retrieveFavorites();
+    return listFavorite;
+  }
+  List<HistorySearch> get getListHistorySearch {
+    retrieveHisSearch();
+    return listHistorySearch;
   }
 }

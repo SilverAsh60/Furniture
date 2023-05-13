@@ -29,6 +29,5 @@ class Favorite extends Equatable{
   }
 
   @override
-  List<Object?> get props => [idProduct,nameProduct,price];
-
+  List<Object?> get props => [idProduct,imgProduct,nameProduct,price , idFavorite];
 }

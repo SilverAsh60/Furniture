@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:final_project_funiture_app/screens/home.dart';
-import 'package:final_project_funiture_app/screens/register.dart';
+import '../screens/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,19 +87,19 @@ class _IntroduceState extends State<Introduce> {
             background: [
               Image(
                 image: AssetImage(imgList[2]),
-                height: 400,
+                height: 300,
               ),
               Image(
                 image: AssetImage(imgList[0]),
-                height: 400,
+                height: 300,
               ),
               Image(
                 image: AssetImage(imgList[1]),
-                height: 400,
+                height: 300,
               ),
               Image(
                 image: AssetImage(imgList[3]),
-                height: 400,
+                height: 300,
               ),
             ],
             speed: 1.8,
@@ -114,7 +113,7 @@ class _IntroduceState extends State<Introduce> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
-                      height: 480,
+                      height: 400,
                     ),
                     Text(
                       textList[0],
@@ -149,7 +148,7 @@ class _IntroduceState extends State<Introduce> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
-                      height: 480,
+                      height: 400,
                     ),
                     Text(
                       textList[1],
@@ -184,7 +183,7 @@ class _IntroduceState extends State<Introduce> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
-                      height: 480,
+                      height: 400,
                     ),
                     Text(
                       textList[2],
@@ -219,7 +218,7 @@ class _IntroduceState extends State<Introduce> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
-                      height: 480,
+                      height: 400,
                     ),
                     Text(
                       textList[3],

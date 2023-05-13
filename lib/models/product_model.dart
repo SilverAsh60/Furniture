@@ -16,6 +16,7 @@ class Product extends Equatable {
   final String title;
   final List<ProductItem> productItemList;
   final List<Review> reviewList;
+  final DateTime timestamp;
 
   const Product({
     required this.title,
@@ -33,10 +34,12 @@ class Product extends Equatable {
     required this.sellest,
     required this.productItemList,
     required this.reviewList,
+    required this.timestamp,
   });
 
   @override
   List<Object?> get props => [
+    timestamp,
         title,
         name,
         img,

@@ -1,15 +1,19 @@
-import 'package:final_project_funiture_app/screens/cart.dart';
-import 'package:final_project_funiture_app/screens/collection.dart';
-import 'package:final_project_funiture_app/screens/favorite.dart';
-import 'package:final_project_funiture_app/screens/home.dart';
-import 'package:final_project_funiture_app/screens/notification.dart';
+import 'package:furniture_app_project/screens/order.dart';
+import 'package:furniture_app_project/screens/profile.dart';
+import 'package:furniture_app_project/screens/search.dart';
+
+import '../screens/cart.dart';
+import '../screens/collection.dart';
+import '../screens/favorite.dart';
+import '../screens/home.dart';
+import '../screens/notification.dart';
 import 'package:flutter/material.dart';
 
 var bottomNavigationBarItems = <BottomNavigationBarItem>[
   const BottomNavigationBarItem(
     backgroundColor: Color(0x00ffffff),
     activeIcon: Icon(
-      Icons.home_outlined,
+      Icons.home,
       color: Color(0xff80221e),
     ),
     icon: Icon(
@@ -22,7 +26,7 @@ var bottomNavigationBarItems = <BottomNavigationBarItem>[
     backgroundColor: Color(0x00ffffff),
     icon: Icon(Icons.grid_view_outlined, color: Colors.black),
     activeIcon: Icon(
-      Icons.grid_view_outlined,
+      Icons.grid_view_rounded,
       color: Color(0xff80221e),
     ),
     label: "Collection",
@@ -31,28 +35,28 @@ var bottomNavigationBarItems = <BottomNavigationBarItem>[
     backgroundColor: Color(0x00ffffff),
     icon: Icon(Icons.shopping_bag_outlined, color: Colors.black),
     activeIcon: Icon(
-      Icons.shopping_bag_outlined,
+      Icons.shopping_bag,
       color: Color(0xff80221e),
     ),
-    label: "Cart",
+    label: "Order",
   ),
   const BottomNavigationBarItem(
     backgroundColor: Color(0x00ffffff),
     activeIcon: Icon(
-      Icons.notifications_active_outlined,
+      Icons.notifications,
       color: Color(0xff80221e),
     ),
-    icon: Icon(Icons.notifications_active_outlined, color: Colors.black),
+    icon: Icon(Icons.notifications_outlined, color: Colors.black),
     label: "Notification",
   ),
   const BottomNavigationBarItem(
     backgroundColor: Color(0x00ffffff),
-    icon: Icon(Icons.favorite_border_outlined, color: Colors.black),
+    icon: Icon(Icons.account_circle_outlined, color: Colors.black),
     activeIcon: Icon(
-      Icons.favorite_border_outlined,
+      Icons.account_circle,
       color: Color(0xff80221e),
     ),
-    label: "Favorite",
+    label: "Account",
   ),
 ];
 
@@ -80,15 +84,15 @@ void itemClick(int selectedItem, BuildContext context) {
         context, MaterialPageRoute(builder: (context) => const HomePage()));
   } else if (selectedItem == 1) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const CollectionPage()));
+        context, MaterialPageRoute(builder: (context) => const Search()));
   } else if (selectedItem == 2) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const CartPage()));
+        context, MaterialPageRoute(builder: (context) => const OrderPage()));
   } else if (selectedItem == 3) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const NotificationPage()));
   } else if (selectedItem == 4) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const FavoritePage()));
+        context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
   }
 }

@@ -1,14 +1,13 @@
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:final_project_funiture_app/constant.dart/size_config.dart';
-import 'package:final_project_funiture_app/provider/banner_provider.dart';
-import 'package:final_project_funiture_app/provider/category_provider.dart';
-import 'package:final_project_funiture_app/provider/product_provider.dart';
-import 'package:final_project_funiture_app/screens/cart.dart';
-import 'package:final_project_funiture_app/screens/favorite.dart';
-import 'package:final_project_funiture_app/screens/product_detail.dart';
-import 'package:final_project_funiture_app/widgets/banner.dart';
-import 'package:final_project_funiture_app/widgets/bottom_navy_bar.dart';
+import '../models/cart_model.dart';
+import '../provider/banner_provider.dart';
+import '../provider/category_provider.dart';
+import '../provider/product_provider.dart';
+import '../screens/cart.dart';
+import '../screens/favorite.dart';
+import '../screens/product_detail.dart';
+import '../widgets/banner.dart';
+import '../widgets/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:glassmorphism/glassmorphism.dart';
@@ -36,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   late DatabaseHandler handler;
 
   late List<Favorite> listFavorite;
+  late List<Cart> listCart;
   late Favorite favorite;
 
   int cartBadgeAmount = 0;
@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage> {
     productProvider.getTopSeller();
     currentUser = handler.getListUser;
   }
-
   late List<UserSQ> currentUser;
 
   setFavorite(Favorite v2) {
@@ -68,14 +67,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     handler = DatabaseHandler();
-    listFavorite = handler.getListFavorite;
-    currentUser = handler.getListUser;
     getCallAllFunction();
   }
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     bannerProvider = Provider.of<BannerProvider>(context);
     categoryProvider = Provider.of<CategoryProvider>(context);
     productProvider = Provider.of<ProductProvider>(context);
@@ -90,9 +86,8 @@ class _HomePageState extends State<HomePage> {
       int favoriteAmount = handler.getListFavorite.length;
       cartBadgeAmount = cartAmount;
       favoriteBadgeAmount = favoriteAmount;
-      handler.retrieveFavorites();
-
       listFavorite = handler.getListFavorite;
+      listCart = handler.getListCart;
     });
 
     showCartBadge = cartBadgeAmount > 0;
@@ -146,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const FavoritePage()));
+                                       const FavoritePage()));
                           }),
                     ),
                     badges.Badge(
@@ -511,7 +506,19 @@ class _HomePageState extends State<HomePage> {
                             Column(
                               children: [
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Cart cart = Cart(
+                                        imgProduct: element.img,
+                                        nameProduct: element.name,
+                                        color: element.productItemList[0].color.keys.elementAt(0),
+                                        quantity: 1,
+                                        idProduct: element.id,
+                                        price: element.currentPrice
+                                    );
+
+                                    handler.insertCart(cart);
+
+                                  },
                                   child: Container(
                                     alignment: Alignment.center,
                                     height: 40,
@@ -556,17 +563,16 @@ class _HomePageState extends State<HomePage> {
                             icon: getIconFavorite(
                                 element.id, listFavorite, element),
                             onPressed: () {
-                              setState(() {
-                                var favorite = Favorite(
-                                  imgProduct: element.img,
-                                  nameProduct: element.name,
-                                  idProduct: element.id,
-                                  price: element.currentPrice,
-                                );
 
-                                handler.insertFavorite(favorite);
-                                handler.retrieveFavorites();
-                              });
+                              var favorite = Favorite(
+                                imgProduct: element.img,
+                                nameProduct: element.name,
+                                idProduct: element.id,
+                                price: element.currentPrice,
+                              );
+
+                              handler.insertFavorite(favorite);
+
                             },
                           ),
                         ],
@@ -742,7 +748,18 @@ class _HomePageState extends State<HomePage> {
                             Column(
                               children: [
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Cart cart = Cart(
+                                        imgProduct: element.img,
+                                        nameProduct: element.name,
+                                        color: element.productItemList[0].color.keys.elementAt(0),
+                                        quantity: 1,
+                                        idProduct: element.id,
+                                        price: element.currentPrice
+                                    );
+
+                                    handler.insertCart(cart);
+                                  },
                                   child: Container(
                                     alignment: Alignment.center,
                                     height: 40,
@@ -787,17 +804,14 @@ class _HomePageState extends State<HomePage> {
                             icon: getIconFavorite(
                                 element.id, listFavorite, element),
                             onPressed: () {
-                              setState(() {
-                                var favorite = Favorite(
-                                  imgProduct: element.img,
-                                  nameProduct: element.name,
-                                  idProduct: element.id,
-                                  price: element.currentPrice,
-                                );
+                              var favorite = Favorite(
+                                imgProduct: element.img,
+                                nameProduct: element.name,
+                                idProduct: element.id,
+                                price: element.currentPrice,
+                              );
+                              handler.insertFavorite(favorite);
 
-                                handler.insertFavorite(favorite);
-                                handler.retrieveFavorites();
-                              });
                             },
                           ),
                         ],
@@ -983,7 +997,18 @@ class _HomePageState extends State<HomePage> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Cart cart = Cart(
+                                            imgProduct: element.img,
+                                            nameProduct: element.name,
+                                            color: element.productItemList[0].color.keys.elementAt(0),
+                                            quantity: 1,
+                                            idProduct: element.id,
+                                            price: element.currentPrice
+                                        );
+
+                                        handler.insertCart(cart);
+                                      },
                                       child: Container(
                                         alignment: Alignment.center,
                                         height: 40,
@@ -1060,17 +1085,13 @@ class _HomePageState extends State<HomePage> {
                                 icon: getIconFavorite(
                                     element.id, listFavorite, element),
                                 onPressed: () {
-                                  setState(() {
-                                    var favorite = Favorite(
-                                      imgProduct: element.img,
-                                      nameProduct: element.name,
-                                      idProduct: element.id,
-                                      price: element.currentPrice,
-                                    );
-
-                                    handler.insertFavorite(favorite);
-                                    handler.retrieveFavorites();
-                                  });
+                                  var favorite = Favorite(
+                                    imgProduct: element.img,
+                                    nameProduct: element.name,
+                                    idProduct: element.id,
+                                    price: element.currentPrice,
+                                  );
+                                  handler.insertFavorite(favorite);
                                 },
                               ),
                             ],
@@ -1312,7 +1333,6 @@ class _HomePageState extends State<HomePage> {
                                     );
 
                                     handler.insertFavorite(favorite);
-                                    handler.retrieveFavorites();
                                   });
                                 },
                               ),
@@ -1374,37 +1394,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (check == false) {
-      return IconButton(
-        icon: const Icon(
-          Icons.favorite_border_outlined,
-          color: Colors.red,
-        ),
-        onPressed: () {
-          setState(() {
-            var favorite = Favorite(
-              imgProduct: product.img,
-              nameProduct: product.name,
-              idProduct: product.id,
-              price: product.currentPrice,
-            );
-
-            handler.insertFavorite(favorite);
-            listFavorite = handler.getListFavorite;
-          });
-        },
+      return const Icon(
+        Icons.favorite_border_outlined,
+        color: Colors.red,
       );
     } else {
-      return IconButton(
-        icon: const Icon(
-          Icons.favorite,
-          color: Colors.red,
-        ),
-        onPressed: () {
-          setState(() {
-            handler.deleteFavorite(idFavorite);
-            listFavorite = handler.getListFavorite;
-          });
-        },
+      return const Icon(
+        Icons.favorite,
+        color: Colors.red,
       );
     }
   }

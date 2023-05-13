@@ -1,8 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:final_project_funiture_app/models/order_model.dart';
-import 'package:final_project_funiture_app/provider/country_city_provider.dart';
-import 'package:final_project_funiture_app/screens/result/result_order.dart';
-import 'package:final_project_funiture_app/services/DatabaseHandler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/order_model.dart';
+import '../provider/country_city_provider.dart';
+import '../screens/result/result_order.dart';
+import '../services/DatabaseHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -142,6 +143,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     countryCityProvider = Provider.of<CountryCityProvider>(context);
+    countryCityProvider.getListCountry();
     listCountry = countryCityProvider.getCountryCityList;
     listCart = handler.getListCart;
     currentUser = handler.getListUser;
@@ -364,7 +366,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if(activeCurrentStep == 3) {
       return Container(
         width: MediaQuery.of(context).size.width,
-        height: 260,
+        height: 250,
         decoration: BoxDecoration(
           border: Border.all(
             color: Colors.white,
@@ -379,7 +381,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           children: [
             const SizedBox(height: 10,),
             Container(
-              height: 150,
+              height: 160,
               width: MediaQuery.of(context).size.width/1.2,
               padding: const EdgeInsets.all(10),
 
@@ -455,7 +457,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(height: 10,),
             Row(
               children: [
                 Expanded(
@@ -465,7 +467,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       height: 50,
                       alignment: Alignment.center,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: const Text(
                           'Cancel',
                           style: TextStyle(
@@ -542,7 +546,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 height: 50,
                 alignment: Alignment.center,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: const Text(
                     'Cancel',
                     style: TextStyle(
@@ -632,7 +638,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom / 1.5,
       ),
-      height: MediaQuery.of(context).size.height / 1.68,
+      height: MediaQuery.of(context).size.height / 2,
       child: SingleChildScrollView(
         reverse: true,
         child: Column(
@@ -901,7 +907,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom / 1.5,
       ),
-      height: MediaQuery.of(context).size.height / 1.65,
+      height: MediaQuery.of(context).size.height / 2,
       child: SingleChildScrollView(
         reverse: true,
         child: Column(
@@ -1080,9 +1086,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     alignment: Alignment.topLeft,
     width: MediaQuery.of(context).size.width,
 
-    height: MediaQuery.of(context).size.height / 2.74,
+    height: MediaQuery.of(context).size.height / 3.5,
     child: SingleChildScrollView(
-    reverse: true,
+    //reverse: true,
       child: Column(
         children: [
           // Shipping address
@@ -1103,7 +1109,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       fontSize: 18,
                     ),),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          activeCurrentStep = 1;
+                          currentActionText = "Next";
+                        });
+                      },
                       child: Container(
                         width: 40,
                         height: 40,
@@ -1241,7 +1252,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       fontSize: 18,
                     ),),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          activeCurrentStep = 2;
+                          currentActionText = "Next";
+                        });
+                      },
                       child: Container(
                         width: 40,
                         height: 40,
@@ -1289,166 +1305,159 @@ class _CheckoutPageState extends State<CheckoutPage> {
           // Order Item
           Row(
             children: const [
-              Text('OrderItem' , style: TextStyle(
+              Text('Order Item' , style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),),
             ],
           ),const SizedBox(height: 20,),
-          FutureBuilder(
-            future: handler.retrieveCarts(),
-            builder: (BuildContext context, AsyncSnapshot<List<Cart>> snapshot) {
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Dismissible(
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: const Color(0xfff2f9fe),
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: const Icon(Icons.delete_forever),
+          ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+              //scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: listCart.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Dismissible(
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: const Color(0xfff2f9fe),
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: const Icon(Icons.delete_forever),
+                  ),
+                  key: ValueKey<int>(listCart[index].idCart!),
+                  onDismissed: (DismissDirection direction) async {
+                    //await handler.deleteCart(listCart[index].idCart!);
+                    setState(() {
+                      listCart.remove(listCart[index]);
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 100,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(left: 5),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(179, 213, 242, 0.2),
+                          spreadRadius: 5,
+                          blurRadius: 16,
                         ),
-                        key: ValueKey<int>(snapshot.data![index].idCart!),
-                        onDismissed: (DismissDirection direction) async {
-                          await handler.deleteCart(snapshot.data![index].idCart!);
-                          setState(() {
-                            snapshot.data!.remove(snapshot.data![index]);
-                          });
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 100,
-                          margin: const EdgeInsets.only(bottom: 10),
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.only(left: 5),
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color.fromRGBO(179, 213, 242, 0.2),
-                                spreadRadius: 5,
-                                blurRadius: 16,
-                              ),
-                            ],
-                          ),
-                          child: Row(
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image(image: AssetImage(
+                                listCart[index].imgProduct),width: 50,
+                                height: 50)
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width / 4.5,
+                          alignment: Alignment.topLeft,
+                          height: 80,
+                          child: Column(
                             mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image(image: AssetImage(
-                                      snapshot.data![index].imgProduct),width: 90,
-                                      height: 90)
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width / 5,
-                                alignment: Alignment.topLeft,
-                                height: 80,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      snapshot.data![index].nameProduct,
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      snapshot.data![index].color,
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      accumPrice(snapshot.data![index].price,
-                                          snapshot.data![index].quantity),
-                                      style: const TextStyle(
-                                        color: Color(0xff5e1414),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                              Text(
+                                listCart[index].nameProduct,
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          updateDownQuantity(
-                                              snapshot.data![index].idCart!,
-                                              snapshot.data![index].quantity);
-                                        });
-                                      },
-                                      icon: const Icon(
-                                        Icons.remove,
-                                        color: Colors.black,
-                                        size: 15,
-                                      )),
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    alignment: Alignment.center,
-                                    decoration: const BoxDecoration(
-                                      borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                    ),
-                                    child: Text(
-                                      snapshot.data![index].quantity.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          updateUpQuantity(
-                                              snapshot.data![index].idCart!,
-                                              snapshot.data![index].quantity);
-                                        });
-                                      },
-                                      icon: const Icon(Icons.add,
-                                          color: Colors.black,size: 15,)),
-                                ],
-                              )
+                              Text(
+                                listCart[index].color,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                accumPrice(listCart[index].price,
+                                    listCart[index].quantity),
+                                style: const TextStyle(
+                                  color: Color(0xff5e1414),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      );
-                    });
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    updateDownQuantity(
+                                        listCart[index].idCart!,
+                                        listCart[index].quantity);
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: Colors.black,
+                                  size: 15,
+                                )),
+                            Container(
+                              width: 20,
+                              height: 20,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5)),
+                              ),
+                              child: Text(
+                                listCart[index].quantity.toString(),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    updateUpQuantity(
+                                        listCart[index].idCart!,
+                                        listCart[index].quantity);
+                                  });
+                                },
+                                icon: const Icon(Icons.add,
+                                  color: Colors.black,size: 15,)),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }),
           const SizedBox(height: 20,),
         ],
       ),
@@ -1937,10 +1946,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Order setOrder() {
-    return Order(idUser: "idUser",
+  OrderModel setOrder() {
+    String idUser = "";
+    Future<void> getPrefs() async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      idUser = prefs.getString('idUser')!;
+    }
+    getPrefs();
+
+    return OrderModel(idUser: idUser,
         paymentMethod: paymentMethod,
-        fullName: fullNameInput.text, address: addressInput.text, city: countryInput, country: cityInput.name, dateOrder: DateTime.now(), deliveryFee: 20, idOrder: 'ORDER${DateTime.now().toString().replaceAll(" ", "")}', note: noteInput.text, phone: phoneInput.text, statusOrder: "CHECKING", statusPayment: "NO PAY", subTotal: totalPrice(listCart), totalOrder: totalPrice(listCart), vat: 25);
+        fullName: fullNameInput.text, address: addressInput.text, city: countryInput, country: cityInput.name, dateOrder: DateTime.now(), deliveryFee: 20, idOrder: 'ORDER${DateTime.now().toString().replaceAll(" ", "")}', note: noteInput.text, phone: phoneInput.text, statusOrder: "CHECKING", statusPayment: "NO PAY", subTotal: totalPrice(listCart), totalOrder: totalPrice(listCart), vat: 25, cartList: const []);
   }
 
   void updateDownQuantity(int idCart, int quantity) {

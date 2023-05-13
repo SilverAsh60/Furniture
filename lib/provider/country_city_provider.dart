@@ -34,10 +34,10 @@ class CountryCityProvider extends ChangeNotifier {
     }
 
     listCountry = newList;
+    notifyListeners();
   }
 
   List<Country> get getCountryCityList {
-    getListCountry();
     return listCountry;
   }
 }
