@@ -1,10 +1,6 @@
 import 'package:furniture_app_project/screens/order.dart';
-import 'package:furniture_app_project/screens/profile.dart';
 import 'package:furniture_app_project/screens/search.dart';
-
-import '../screens/cart.dart';
-import '../screens/collection.dart';
-import '../screens/favorite.dart';
+import 'package:furniture_app_project/screens/test.dart';
 import '../screens/home.dart';
 import '../screens/notification.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +89,6 @@ void itemClick(int selectedItem, BuildContext context) {
         MaterialPageRoute(builder: (context) => const NotificationPage()));
   } else if (selectedItem == 4) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
+        context, MaterialPageRoute(builder: (context) => const ProfilePage()));
   }
 }

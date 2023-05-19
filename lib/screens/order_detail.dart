@@ -690,7 +690,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     DateFormat dateFormat = DateFormat("dd/MM/yyyy  hh:MM:ss");
     return dateFormat.format(date);
   }
-  
 }
 
 class CustomBill extends CustomPainter {

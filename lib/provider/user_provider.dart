@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -57,6 +58,11 @@ class UserProvider extends ChangeNotifier {
     currentUser = us;
     notifyListeners();
   }
+  
+  Future<void> updateUser(UserSQ user) async {
+    await FirebaseFirestore.instance.collection('user').doc(user.idUser).set(user.toMap());
+    getDocCurrentUser(user.idUser);
+  }
 
   UserSQ get getCurrentUser {
     return currentUser;
@@ -64,5 +70,9 @@ class UserProvider extends ChangeNotifier {
 
   List<UserSQ> get getListUserSQ {
     return listUser;
+  }
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
   }
 }

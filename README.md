@@ -54,3 +54,9 @@ Final Project - Funiture App Ecommerce
   * Profile page
     * Show infor
     * Update information
+    * Update Image
+  * Cart Page
+  * Favorite Page
+  * Order Page
+  * Log out
+
