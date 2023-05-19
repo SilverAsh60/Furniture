@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:furniture_app_project/models/cart_model.dart';
 import 'package:furniture_app_project/provider/order_provider.dart';
+import 'package:furniture_app_project/provider/user_provider.dart';
 import 'package:furniture_app_project/screens/cart.dart';
 import 'package:furniture_app_project/screens/favorite.dart';
+import 'package:furniture_app_project/screens/order_detail.dart';
 import 'package:furniture_app_project/widgets/bottom_navy_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,21 +22,18 @@ class OrderPage extends StatefulWidget {
 }
 
 OrderProvider orderProvider = OrderProvider();
+UserProvider userProvider = UserProvider();
 
 class _OrderPageState extends State<OrderPage> {
 
-  String idUser = "AIA1EwLcVsgeCT5FOfceJr4yLNg1";
   List<OrderModel> listOrder = [];
-
-  Future<void> getPrefs() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    idUser = prefs.getString('idUser')!;
-  }
 
   @override
   Widget build(BuildContext context) {
     orderProvider = Provider.of<OrderProvider>(context);
-    orderProvider.getOrderByIDUser(idUser);
+    userProvider = Provider.of<UserProvider>(context);
+
+    orderProvider.getOrderByIDUser(userProvider.currentUser.idUser);
     listOrder = orderProvider.getLIstOrder;
 
     return MaterialApp(
@@ -96,12 +95,15 @@ class _OrderPageState extends State<OrderPage> {
               ],
             ), // Tab
           ),
-          body: TabBarView(
+          body: Container(
+            padding: const EdgeInsets.only(top: 20,bottom: 20),
+            child: TabBarView(
               children: [
                 getCart('CHECKING'),
                 getCart('DELIVERING'),
                 getCart('COMPLETE'),
               ],
+            ),
           ),
           bottomNavigationBar: getFooter(2, context),
         ),
@@ -113,77 +115,82 @@ class _OrderPageState extends State<OrderPage> {
 
     var newList = listOrder.where((element) => element.statusOrder == checking).toList();
     if(newList.isNotEmpty) {
-      return Wrap(
+      return ListView(
         children: newList.map((e) {
-          return Container(
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-              BorderRadius.all(Radius.circular(10)),
-              boxShadow: [
-                BoxShadow(
-                  //color: Color.fromRGBO(179, 213, 242, 0.2),
-                    color: Color(0xffe3eaef),
-                    spreadRadius: 0.06,
-                    blurRadius: 12,
-                    offset: Offset(6, 6)),
-                BoxShadow(
-                  //color: Color.fromRGBO(179, 213, 242, 0.2),
-                    color: Color(0xffffffff),
-                    spreadRadius: 0.06,
-                    blurRadius: 12,
-                    offset: Offset(-6, -6)),
-              ],
-            ),
-            margin: const EdgeInsets.all(10),
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  child: const Image(image: AssetImage('assets/icons/bill.png'),fit: BoxFit.fill,),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width / 2,
-                      child: Text("#${e.idOrder.replaceAll('-', "").replaceAll(':', "").replaceAll('.', "")}" , style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),overflow: TextOverflow.ellipsis,),
-                    ),
-                    const SizedBox(height: 5,),
-                    Text("Customer: ${e.fullName}" , style: const TextStyle(
-                      fontSize: 14,
-                    ),),
-                    const SizedBox(height: 5,),
-                    Text("Phone: ${e.phone}" , style: const TextStyle(
-                      fontSize: 14,
-                    ),),
-                    const SizedBox(height: 5,),
-                    Text("Address: ${e.address}" , style: const TextStyle(
-                      fontSize: 14,
-                    ),),
-                    const SizedBox(height: 5,),
-                    Text("Bill: \$ ${e.totalOrder}" , style: const TextStyle(
-                      fontSize: 14,
-                    ),),
-                    const SizedBox(height: 5,),
-                    Container(
-                      width: MediaQuery.of(context).size.width / 1.6,
-                      alignment: Alignment.bottomRight,
-                      child: Text("CHECKING" , textAlign: TextAlign.end,style: TextStyle(
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(order: e)));
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    //color: Color.fromRGBO(179, 213, 242, 0.2),
+                      color: Color(0xffe3eaef),
+                      spreadRadius: 0.06,
+                      blurRadius: 12,
+                      offset: Offset(6, 6)),
+                  BoxShadow(
+                    //color: Color.fromRGBO(179, 213, 242, 0.2),
+                      color: Color(0xffffffff),
+                      spreadRadius: 0.06,
+                      blurRadius: 12,
+                      offset: Offset(-6, -6)),
+                ],
+              ),
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Image(image: AssetImage('assets/icons/bill.png'),fit: BoxFit.fill,),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2,
+                        child: Text("#${e.idOrder.replaceAll('-', "").replaceAll(':', "").replaceAll('.', "")}" , style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),overflow: TextOverflow.ellipsis,),
+                      ),
+                      const SizedBox(height: 5,),
+                      Text("Customer: ${e.fullName}" , style: const TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red[700],
                       ),),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(height: 5,),
+                      Text("Phone: ${e.phone}" , style: const TextStyle(
+                        fontSize: 14,
+                      ),),
+                      const SizedBox(height: 5,),
+                      Text("Address: ${e.address}" , style: const TextStyle(
+                        fontSize: 14,
+                      ),),
+                      const SizedBox(height: 5,),
+                      Text("Bill: \$ ${e.totalOrder.toStringAsFixed(2)}" , style: const TextStyle(
+                        fontSize: 14,
+                      ),),
+                      const SizedBox(height: 5,),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 1.6,
+                        alignment: Alignment.bottomRight,
+                        child: Text("CHECKING" , textAlign: TextAlign.end,style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red[700],
+                        ),),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         }).toList(),

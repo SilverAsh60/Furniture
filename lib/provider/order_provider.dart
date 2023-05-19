@@ -8,6 +8,7 @@ class OrderProvider extends ChangeNotifier {
   List<OrderModel> listOrder = [];
 
    bool addCartSucc = false;
+
   Future<void> addOrder(order , listCart) async {
     bool flag = false;
     DatabaseHandler handler = DatabaseHandler();
@@ -19,6 +20,14 @@ class OrderProvider extends ChangeNotifier {
 
     addCartSucc = flag;
     notifyListeners();
+  }
+
+  Future<void> updateOrder(OrderModel order , String idUser) async {
+    await FirebaseFirestore.instance.collection('order').doc(order.idOrder).update(
+        {'statusOrder': 'CANCEL'}).then((value) {
+          getOrderByIDUser(idUser);
+    })
+    ;
   }
 
   Future<void> getOrderByIDUser(String idUser) async {
@@ -69,6 +78,7 @@ class OrderProvider extends ChangeNotifier {
     listOrder = newlistOrder;
     notifyListeners();
   }
+
 
   bool get getStatus {
     return addCartSucc;

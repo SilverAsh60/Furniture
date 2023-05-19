@@ -1,4 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:furniture_app_project/provider/user_provider.dart';
+import 'package:furniture_app_project/screens/test.dart';
 import '../models/cart_model.dart';
 import '../provider/banner_provider.dart';
 import '../provider/category_provider.dart';
@@ -15,7 +18,6 @@ import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
 import '../models/favorite_model.dart';
 import '../models/product_model.dart';
-import '../models/user_model.dart';
 import '../services/DatabaseHandler.dart';
 import '../widgets/category_list.dart';
 import '../widgets/search.dart';
@@ -30,9 +32,11 @@ class HomePage extends StatefulWidget {
 BannerProvider bannerProvider = BannerProvider();
 CategoryProvider categoryProvider = CategoryProvider();
 ProductProvider productProvider = ProductProvider();
+UserProvider userProvider = UserProvider();
 
 class _HomePageState extends State<HomePage> {
   late DatabaseHandler handler;
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   late List<Favorite> listFavorite;
   late List<Cart> listCart;
@@ -53,9 +57,8 @@ class _HomePageState extends State<HomePage> {
     productProvider.getNewArchiveProduct();
     productProvider.getReview();
     productProvider.getTopSeller();
-    currentUser = handler.getListUser;
+    userProvider.getDocCurrentUser(auth.currentUser?.uid);
   }
-  late List<UserSQ> currentUser;
 
   setFavorite(Favorite v2) {
     setState(() {
@@ -75,6 +78,7 @@ class _HomePageState extends State<HomePage> {
     bannerProvider = Provider.of<BannerProvider>(context);
     categoryProvider = Provider.of<CategoryProvider>(context);
     productProvider = Provider.of<ProductProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
 
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
@@ -108,17 +112,24 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      maxRadius: height * 0.1 / 2.1,
-                      backgroundColor: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const TestPage()));
+                      },
                       child: Container(
+                        width: 40,
                         height: 40,
-                        padding: const EdgeInsets.all(0),
-                        child: const Image(
-                          image: AssetImage("assets/icons/user.png"),
+                        margin: const EdgeInsets.only(left: 10,right: 10),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          child:  userProvider.currentUser.img.isNotEmpty ? FadeInImage(
+                            fit: BoxFit.fill,
+                            placeholder: const AssetImage('assets/icons/user.png'),
+                            image: NetworkImage(userProvider.currentUser.img),
+                          ) : const Image(image: AssetImage('assets/icons/user.png')),
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
                 searchField(context),
@@ -512,7 +523,7 @@ class _HomePageState extends State<HomePage> {
                                         nameProduct: element.name,
                                         color: element.productItemList[0].color.keys.elementAt(0),
                                         quantity: 1,
-                                        idProduct: element.id,
+                                        idProduct: element.productItemList[0].id,
                                         price: element.currentPrice
                                     );
 
@@ -564,6 +575,27 @@ class _HomePageState extends State<HomePage> {
                                 element.id, listFavorite, element),
                             onPressed: () {
 
+                              showDialog(
+                                  context: context,
+                                  builder: (_) {
+                                    return Dialog(
+                                      // The background color
+                                      backgroundColor: const Color(0xff560f20),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            SizedBox(height: 20,),
+                                            CircularProgressIndicator(color: Color(0xffecd8e0),),
+                                            SizedBox(height: 20,),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+                              );
+
                               var favorite = Favorite(
                                 imgProduct: element.img,
                                 nameProduct: element.name,
@@ -572,6 +604,8 @@ class _HomePageState extends State<HomePage> {
                               );
 
                               handler.insertFavorite(favorite);
+
+                              Navigator.pop(context);
 
                             },
                           ),
@@ -754,7 +788,7 @@ class _HomePageState extends State<HomePage> {
                                         nameProduct: element.name,
                                         color: element.productItemList[0].color.keys.elementAt(0),
                                         quantity: 1,
-                                        idProduct: element.id,
+                                        idProduct: element.productItemList[0].id,
                                         price: element.currentPrice
                                     );
 
@@ -811,7 +845,6 @@ class _HomePageState extends State<HomePage> {
                                 price: element.currentPrice,
                               );
                               handler.insertFavorite(favorite);
-
                             },
                           ),
                         ],
@@ -1003,7 +1036,7 @@ class _HomePageState extends State<HomePage> {
                                             nameProduct: element.name,
                                             color: element.productItemList[0].color.keys.elementAt(0),
                                             quantity: 1,
-                                            idProduct: element.id,
+                                            idProduct: element.productItemList[0].id,
                                             price: element.currentPrice
                                         );
 
@@ -1274,7 +1307,18 @@ class _HomePageState extends State<HomePage> {
                                 Column(
                                   children: [
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Cart cart = Cart(
+                                            imgProduct: element.img,
+                                            nameProduct: element.name,
+                                            color: element.productItemList[0].color.keys.elementAt(0),
+                                            quantity: 1,
+                                            idProduct: element.productItemList[0].id,
+                                            price: element.currentPrice
+                                        );
+
+                                        handler.insertCart(cart);
+                                      },
                                       child: Container(
                                         alignment: Alignment.center,
                                         height: 40,
@@ -1384,12 +1428,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget getIconFavorite(
       String idProduct, List<Favorite> favorite, Product product) {
-    int idFavorite = -1;
     bool check = false;
     for (var element in favorite) {
       if (element.idProduct == idProduct) {
         check = true;
-        idFavorite = element.idFavorite!;
       }
     }
 
@@ -1479,14 +1521,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  String getTextUser() {
-    if (currentUser.isNotEmpty) {
-      return currentUser[0].fullName;
-    } else {
-      return "";
-    }
   }
 
   Widget getReviewStar(double review) {

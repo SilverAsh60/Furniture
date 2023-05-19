@@ -44,9 +44,13 @@ Final Project - Funiture App Ecommerce
   * Review information and Order
 * Search page
   * Search by name product
-  * Filter 
-* Profile page
-  * Show infor
-  * Update information
+  * Show product by category
+  * Filter product
 * Order Page
   * Show Order - CHECKING , DELIVERING, COMPLETE
+  * Show Order Detail
+  * Cancel Order with CHECKING
+* Setting Page
+  * Profile page
+    * Show infor
+    * Update information

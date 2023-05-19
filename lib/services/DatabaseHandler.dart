@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:furniture_app_project/models/history_search_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -106,17 +108,20 @@ class DatabaseHandler {
       }
     }
 
-    if(idCart == -1) {
-      result = await db.insert('Cart', cart.toMap());
-    }
-    else {
-      result = await db.update(
-        'Cart',
-        {'quantity': quantity + 1},
-        where: 'idCart = ?',
-        whereArgs: [idCart],
-      );
-    }
+    await db.transaction((txn) async {
+      if(idCart == -1) {
+        result = await txn.insert('Cart', cart.toMap());
+      }
+      else {
+        result = await txn.update(
+          'Cart',
+          {'quantity': quantity + 1},
+          where: 'idCart = ?',
+          whereArgs: [idCart],
+        );
+      }
+    });
+
     return result;
   }
   Future<void> deleteCart(int idCart) async {
@@ -129,14 +134,17 @@ class DatabaseHandler {
   }
   Future<void> updateCart(int idCart, int quantity) async {
     final db = await initializeDB();
-    await db.update(
-      'Cart',
-      {'quantity': quantity},
-      where: 'idCart = ?',
-      whereArgs: [idCart],
-    );
+   await db.transaction((txn) async {
+     await txn.update(
+       'Cart',
+       {'quantity': quantity},
+       where: 'idCart = ?',
+       whereArgs: [idCart],
+     );
+   });
   }
   Future<int> insertFavorite(Favorite favorite) async {
+
     int result = 0;
     final Database db = await initializeDB();
     List<Favorite> favoriteList = getListFavorite;

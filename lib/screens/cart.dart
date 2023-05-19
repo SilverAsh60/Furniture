@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../models/cart_model.dart';
 import '../provider/product_provider.dart';
 import '../services/DatabaseHandler.dart';
+import '../widgets/bottom_navy_bar.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -71,17 +72,16 @@ class _CartPageState extends State<CartPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: const Icon(Icons.delete_forever),
               ),
+
+              secondaryBackground: Container(
+                color: const Color(0xff81221e),
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: const Icon(Icons.delete_forever),
+              ),
               key: ValueKey<int>(listCart[index].idCart!),
-              onDismissed: (DismissDirection direction) async {
-                try {
-                  await handler.deleteCart(listCart[index].idCart!);
-                  setState(() {
-                    listCart.remove(listCart[index]);
-                  });
-                }
-                catch (e) {
-                  print(e);
-                }
+              onDismissed: (DismissDirection direction) {
+                deleteCart(listCart[index].idCart!);
               },
               child: Container(
                 width: MediaQuery.of(context).size.width,
@@ -141,6 +141,7 @@ class _CartPageState extends State<CartPage> {
                               color: Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis
                             ),
                           ),
                           SizedBox(
@@ -153,6 +154,7 @@ class _CartPageState extends State<CartPage> {
                                 color: Colors.black,
                                 fontSize: 13,
                                 fontWeight: FontWeight.normal,
+                                  overflow: TextOverflow.ellipsis
                               ),
                             ),
                           ),
@@ -220,12 +222,30 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
             );
-          }) : const Center(child: CircularProgressIndicator(),),
-      bottomNavigationBar: listCart.isNotEmpty ? getFooter(): Container(height: 0,),
+          }) : Center(
+        child: Column(
+          children: [
+            SizedBox(height: MediaQuery.of(context).size.height / 2 - 200,),
+            const Image(image: AssetImage("assets/icons/empty.png")),
+            const Text(
+              'Not Cart',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: listCart.isNotEmpty ? getCFooter() : getFooter(1, context),
     );
   }
 
-  Widget getFooter() {
+  void deleteCart(int idCart) {
+    handler.deleteCart(idCart);
+  }
+
+
+  Widget getCFooter() {
     return Container(
       height: MediaQuery.of(context).size.height / 3,
       padding: const EdgeInsets.all(30),

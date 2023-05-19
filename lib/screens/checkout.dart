@@ -1,12 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:furniture_app_project/provider/user_provider.dart';
 import '../models/order_model.dart';
 import '../provider/country_city_provider.dart';
 import '../screens/result/result_order.dart';
 import '../services/DatabaseHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../models/cart_model.dart';
 import '../models/user_model.dart';
 
@@ -17,8 +16,8 @@ class CheckoutPage extends StatefulWidget {
   State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
+UserProvider userProvider = UserProvider();
 CountryCityProvider countryCityProvider = CountryCityProvider();
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class _CheckoutPageState extends State<CheckoutPage> {
   late DatabaseHandler handler;
@@ -69,7 +68,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   List<Country> listCountry = [];
 
   // Step 2
-  String paymentMethod = '';
+  String paymentMethod = 'Pay on delivery';
   String paymentMethodCollection = 'Pay on delivery';
 
   bool checkActiveCard(String cardName) {
@@ -140,16 +139,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
+  int num = 0;
+
   @override
   Widget build(BuildContext context) {
     countryCityProvider = Provider.of<CountryCityProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
+
+    if (num == 0) {
+      fullNameInput.text = userProvider.currentUser.fullName;
+      phoneInput.text = userProvider.currentUser.phone;
+      addressInput.text = userProvider.currentUser.address;
+
+      num = 1;
+    }
+
     countryCityProvider.getListCountry();
     listCountry = countryCityProvider.getCountryCityList;
     listCart = handler.getListCart;
     currentUser = handler.getListUser;
 
     return Scaffold(
-      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xfff2f9fe),
       appBar: AppBar(
@@ -402,7 +412,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       const Text('Subtotal',style: TextStyle(
                         fontSize: 15,
                       ),),
-                      Text("\$ ${totalPrice(listCart)}",style: const TextStyle(
+                      Text("\$ ${totalPrice(listCart).toStringAsFixed(2)}",style: const TextStyle(
                         fontSize: 15,
                       ),),
                     ],
@@ -728,6 +738,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 border: Border.all(width: 1, color: Colors.grey),
               ),
               child: TextField(
+                readOnly: true,
                 onChanged: (value) {
                   if (value.isEmpty || digitValidator.hasMatch(value)) {
                     setState(() {
@@ -870,33 +881,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       ),
     );
-  }
-
-  String getFullname() {
-    if(currentUser.isNotEmpty) {
-      return currentUser[0].fullName;
-    }
-    else {
-      return "";
-    }
-  }
-
-  String getPhone() {
-    if(currentUser.isNotEmpty) {
-      return currentUser[0].phone;
-    }
-    else {
-      return "";
-    }
-  }
-
-  String getAddress() {
-    if(currentUser.isNotEmpty) {
-      return currentUser[0].address;
-    }
-    else {
-      return "";
-    }
   }
 
   Widget getStep2Payment() {
@@ -1947,16 +1931,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   OrderModel setOrder() {
-    String idUser = "";
-    Future<void> getPrefs() async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      idUser = prefs.getString('idUser')!;
-    }
-    getPrefs();
-
-    return OrderModel(idUser: idUser,
+    return OrderModel(idUser: userProvider.currentUser.idUser,
         paymentMethod: paymentMethod,
-        fullName: fullNameInput.text, address: addressInput.text, city: countryInput, country: cityInput.name, dateOrder: DateTime.now(), deliveryFee: 20, idOrder: 'ORDER${DateTime.now().toString().replaceAll(" ", "")}', note: noteInput.text, phone: phoneInput.text, statusOrder: "CHECKING", statusPayment: "NO PAY", subTotal: totalPrice(listCart), totalOrder: totalPrice(listCart), vat: 25, cartList: const []);
+        fullName: fullNameInput.text, address: addressInput.text, city: countryInput, country: cityInput.name, dateOrder: DateTime.now(), deliveryFee: 20, idOrder: DateTime.now().toString().replaceAll(" ", "").replaceAll("-", "").replaceAll(".", "").replaceAll(":", ""), note: noteInput.text, phone: phoneInput.text, statusOrder: "CHECKING", statusPayment: "NO PAY", subTotal: totalPrice(listCart), totalOrder: accumALLBILL(), vat: accumVAT(), cartList: const []);
   }
 
   void updateDownQuantity(int idCart, int quantity) {

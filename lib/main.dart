@@ -1,6 +1,8 @@
 import 'package:furniture_app_project/provider/filter_provider.dart';
 import 'package:furniture_app_project/screens/introduce.dart';
 import 'package:furniture_app_project/screens/profile.dart';
+import 'package:furniture_app_project/screens/register.dart';
+import 'package:furniture_app_project/screens/test.dart';
 import 'package:furniture_app_project/screens/welcome.dart';
 
 import 'provider/banner_provider.dart';

@@ -125,7 +125,6 @@ class _VerifyState extends State<Verify> {
                     onPressed: () {
                       setState(() {
                         submitPhoneNumber(context);
-                        page = 1;
                       });
                     },
                   ),
@@ -472,8 +471,9 @@ class _VerifyState extends State<Verify> {
       }
       setState(() {
         status += 'verificationCompleted\n';
+        phoneAuthCredential = phoneAuth;
       });
-      phoneAuthCredential = phoneAuth;
+
       if (kDebugMode) {
         print(phoneAuthCredential);
       }
@@ -529,17 +529,20 @@ class _VerifyState extends State<Verify> {
       if (kDebugMode) {
         print ('OTP sent') ;
       }
-      verificationID = verificationId;
+
+      setState(() {
+        verificationID = verificationId;
+        this.code = code!;
+        status += 'Code Sent\n';
+      });
+
       if (kDebugMode) {
         print(verificationId);
       }
-      this.code = code!;
+      //this.code = code!;
       if (kDebugMode) {
         print(code.toString());
       }
-      setState(() {
-        status += 'Code Sent\n';
-      });
     }
     
     void codeAutoRetrievalTimout(String verificationId) {
@@ -554,7 +557,6 @@ class _VerifyState extends State<Verify> {
       }
     }
 
-
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
         timeout: const Duration(milliseconds: 3000),
@@ -562,12 +564,17 @@ class _VerifyState extends State<Verify> {
         verificationFailed: verificationFailed,
         codeSent: codeOTPSent,
         codeAutoRetrievalTimeout: codeAutoRetrievalTimout
-    );
+    ).then((value) {
+      setState(() {
+        page = 1;
+      });
+    });
 
     Navigator.pop(context);
   }
 
   void submitOTP() {
+
     String smsCode = otp;
     phoneAuthCredential = PhoneAuthProvider.credential(
         verificationId: verificationID, smsCode: smsCode);
@@ -599,7 +606,8 @@ class _VerifyState extends State<Verify> {
             );
           }
       );
-      //await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential).then((value) async => await FirebaseFirestore.instance.collection('user').doc(widget.idUser).set({'status' : 'VALID' }));
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential).then((value) async => await FirebaseFirestore.instance.collection('user').doc(widget.idUser).update(
+          {'status' : 'VALID'}));
       setState(() {
         status += 'Signed In\n';
         verifyTr = true;
@@ -608,7 +616,7 @@ class _VerifyState extends State<Verify> {
       
 
       if (kDebugMode) {
-        print("sucess");
+        print("success");
       }
     }
     on FirebaseAuthException catch(err) {

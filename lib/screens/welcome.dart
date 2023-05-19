@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../screens/home.dart';
 import '../screens/introduce.dart';
 import '../screens/login.dart';
@@ -15,6 +17,8 @@ class Welcom extends StatefulWidget {
 
 class _WelcomState extends State<Welcom> {
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   void initState()  {
     super.initState();
@@ -24,12 +28,12 @@ class _WelcomState extends State<Welcom> {
   Future<void> getPrefs() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? hideIntroducePage = prefs.getBool('SHOW_INTRODUCT_PAGE');
-    bool? hideLoginPage = prefs.getBool('LOGIN');
 
     Timer(const Duration(seconds: 4), () {
 
       if (hideIntroducePage != null && hideIntroducePage == true) {
-        if(hideLoginPage != null && hideLoginPage == true) {
+
+        if(auth.currentUser?.uid != null) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => const HomePage()));
         }

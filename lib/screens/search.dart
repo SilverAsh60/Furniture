@@ -1067,7 +1067,7 @@ class _SearchState extends State<Search> {
           crossAxisCount: 2,
           mainAxisSpacing: 20,
           crossAxisSpacing: 20,
-          childAspectRatio: 0.693,
+          childAspectRatio: 0.6,
         ),
         itemBuilder: (BuildContext context, int index) => getProductCard(searchedProducts[index]),
       );
@@ -1405,9 +1405,9 @@ class _SearchState extends State<Search> {
             decoration: const BoxDecoration (
               color: Colors.white,
             ),
-            margin: const EdgeInsets.only(top: 150),
+            margin: const EdgeInsets.only(top: 170),
             padding: const EdgeInsets.all(5),
-            height: 260,
+            height: 280,
             alignment: Alignment.bottomCenter,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1426,6 +1426,7 @@ class _SearchState extends State<Search> {
                             color: Colors.black,
                             fontFamily: "Roboto",
                             fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis
                           ),
                         ),
                         const SizedBox(
@@ -1440,6 +1441,7 @@ class _SearchState extends State<Search> {
                             fontFamily: "Roboto",
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
+                              overflow: TextOverflow.ellipsis
                           ),
                         ),
                         const SizedBox(
@@ -1498,12 +1500,11 @@ class _SearchState extends State<Search> {
                               nameProduct: product.name,
                               color: product.productItemList[0].color.keys.elementAt(0),
                               quantity: 1,
-                              idProduct: product.id,
+                              idProduct: product.productItemList[0].id,
                               price: product.currentPrice
                           );
 
                           handle.insertCart(cart);
-                          handle.retrieveCarts();
                         });
                       },
                       child: Container(
@@ -1527,7 +1528,7 @@ class _SearchState extends State<Search> {
           ),
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(top: 230),
+            margin: const EdgeInsets.only(top: 250),
             height: 15,
             child: ListView.builder(
                 shrinkWrap: true,
@@ -1575,7 +1576,6 @@ class _SearchState extends State<Search> {
                         );
 
                         handle.insertFavorite(favorite);
-                        handle.retrieveFavorites();
                       });
                     },
                   ),
@@ -1683,47 +1683,22 @@ class _SearchState extends State<Search> {
 
   Widget getIconFavorite(
       String idProduct, List<Favorite> favorite, Product product) {
-    int idFavorite = -1;
     bool check = false;
     for (var element in favorite) {
       if (element.idProduct == idProduct) {
         check = true;
-        idFavorite = element.idFavorite!;
       }
     }
 
     if (check == false) {
-      return IconButton(
-        icon: const Icon(
-          Icons.favorite_border_outlined,
-          color: Colors.red,
-        ),
-        onPressed: () {
-          setState(() {
-            var favorite = Favorite(
-              imgProduct: product.img,
-              nameProduct: product.name,
-              idProduct: product.id,
-              price: product.currentPrice,
-            );
-
-            handle.insertFavorite(favorite);
-            listFavorite = handle.getListFavorite;
-          });
-        },
+      return const Icon(
+        Icons.favorite_border_outlined,
+        color: Colors.red,
       );
     } else {
-      return IconButton(
-        icon: const Icon(
-          Icons.favorite,
-          color: Colors.red,
-        ),
-        onPressed: () {
-          setState(() {
-            handle.deleteFavorite(idFavorite);
-            listFavorite = handle.getListFavorite;
-          });
-        },
+      return const Icon(
+        Icons.favorite,
+        color: Colors.red,
       );
     }
   }

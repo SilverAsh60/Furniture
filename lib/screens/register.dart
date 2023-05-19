@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screens/login.dart';
 import '../screens/verify.dart';
-import '../services/DatabaseHandler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +46,6 @@ class _RegisterState extends State<Register> {
   bool validatePassword = true;
   bool validateConfirmPass = true;
 
-  late DatabaseHandler handler;
-
 
   void submit(context) async {
     UserCredential result;
@@ -77,10 +74,6 @@ class _RegisterState extends State<Register> {
       result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: "${phoneNumber.text}@gmail.com", password: password.text);
 
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("idUser", result.user!.uid);
-
-      //print(result);
       UserSQ newUser = UserSQ(
           email: "",
           phone: currentPhoneNumber.value + phoneNumber.text,
@@ -96,6 +89,9 @@ class _RegisterState extends State<Register> {
       await FirebaseFirestore.instance.collection("user")
           .doc(result.user!.uid)
           .set(newUser.toMap());
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("idUser", result.user!.uid);
 
       Navigator.pop(context);
 
@@ -237,7 +233,6 @@ class _RegisterState extends State<Register> {
   void initState() {
     getPrefs();
     super.initState();
-    handler = DatabaseHandler();
   }
 
   Future<void> getPrefs() async {

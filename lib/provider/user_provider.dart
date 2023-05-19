@@ -6,6 +6,10 @@ import '../models/product_model.dart';
 
 class UserProvider extends ChangeNotifier {
   List<UserSQ> listUser = [];
+  UserSQ currentUser = const UserSQ(status: '',
+      email: '', phone: '', fullName: '', address: '', img: '',
+      birthDate: '', idUser: '', dateEnter: '', gender: '');
+
 
   Future<void> getListUser(List<Review> listReview) async {
     List<UserSQ> newList = [];
@@ -33,6 +37,29 @@ class UserProvider extends ChangeNotifier {
 
     listUser = newList;
     notifyListeners();
+  }
+
+  Future<void> getDocCurrentUser(String? id) async {
+
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('user').doc(id).get();
+    var us = UserSQ(
+        status: documentSnapshot['status'],
+        email: documentSnapshot['email'],
+        phone: documentSnapshot['phone'],
+        fullName: documentSnapshot['fullName'],
+        address: documentSnapshot['address'],
+        img: documentSnapshot['img'],
+        birthDate: documentSnapshot['birthDate'],
+        idUser:documentSnapshot['idUser'],
+        dateEnter: documentSnapshot['dateEnter'],
+        gender: documentSnapshot['gender']);
+
+    currentUser = us;
+    notifyListeners();
+  }
+
+  UserSQ get getCurrentUser {
+    return currentUser;
   }
 
   List<UserSQ> get getListUserSQ {

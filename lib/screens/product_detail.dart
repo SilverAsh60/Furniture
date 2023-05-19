@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:furniture_app_project/widgets/bottom_navy_bar.dart';
 import '../models/favorite_model.dart';
 import '../models/user_model.dart';
 import '../provider/user_provider.dart';
@@ -81,6 +82,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    userProvider = Provider.of<UserProvider>(context);
     if (number == 0) {
       setState(() {
         productItem = widget.productID.productItemList[0];
@@ -94,9 +96,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     });
 
     bool showCartBadge = cartBadgeAmount > 0;
-
-    userProvider = Provider.of<UserProvider>(context);
-    userProvider.getListUser(widget.productID.reviewList);
     listUser = userProvider.getListUserSQ;
 
     return WillPopScope(
@@ -155,6 +154,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   )),
             ),
           ),
+          bottomNavigationBar: getFooter(1, context),
         ));
   }
 
@@ -365,18 +365,44 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           width: MediaQuery.of(context).size.width / 2,
           height: 150,
           child: Stack(children: [
+
             // Favorite
             Positioned(
               bottom: 50,
               left: MediaQuery.of(context).size.width / 3,
               child: GestureDetector(
                 onTap: () {
+
+                  showDialog(
+                      context: context,
+                      builder: (_) {
+                        return Dialog(
+                          // The background color
+                          backgroundColor: const Color(0xff560f20),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                SizedBox(height: 20,),
+                                CircularProgressIndicator(color: Color(0xffecd8e0),),
+                                SizedBox(height: 20,),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                  );
+
                   var fav = Favorite(
                       imgProduct: productItem.img[0],
                       nameProduct: widget.productID.name,
-                      idProduct: productItem.id,
+                      idProduct: widget.productID.id,
                       price: widget.productID.currentPrice);
+
                   handler.insertFavorite(fav);
+
+                  Navigator.pop(context);
                 },
                 child: Container(
                     width: 50,
@@ -385,11 +411,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                       borderRadius: BorderRadius.all(Radius.circular(25)),
                       color: Colors.white,
                     ),
-                    child: const Icon(
-                      Icons.favorite_border_outlined,
-                      color: Color(0xff81221e),
-                      size: 30,
-                    )),
+                    child: getIconFavorite(widget.productID.id, handler.getListFavorite,widget.productID),
+                ),
               ),
             ),
             // Add cart
@@ -401,8 +424,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   var cartNew = Cart(
                       imgProduct: productItem.img[0],
                       nameProduct: widget.productID.name,
-                      color: productItem.color.values.elementAt(0),
-                      quantity: 1, idProduct: widget.productID.id, price:widget.productID.currentPrice
+                      color: productItem.color.keys.elementAt(0),
+                      quantity: 1, idProduct: productItem.id, price:widget.productID.currentPrice
                   );
 
                   handler.insertCart(cartNew);
@@ -656,7 +679,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   height: 40,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(50)),
-                    color: Color(0xfff2f9fe),
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Color.fromRGBO(179, 213, 242, 1),
@@ -762,7 +785,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   height: 40,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(50)),
-                    color: Color(0xfff2f9fe),
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Color.fromRGBO(179, 213, 242, 1),
@@ -861,7 +884,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   height: 40,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(50)),
-                    color: Color(0xfff2f9fe),
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Color.fromRGBO(179, 213, 242, 1),
@@ -959,7 +982,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   height: 40,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(50)),
-                    color: Color(0xfff2f9fe),
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Color.fromRGBO(179, 213, 242, 1),
@@ -1048,11 +1071,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 2,
-                    )
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 2,
+                      )
                   ),
 
                   child: Column(
@@ -1120,7 +1144,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                             itemCount:
                             widget.productID.reviewList[index].img.length,
                             itemBuilder: (BuildContext context, int e) {
-                              return Container(
+                              return SizedBox(
                                 width: 100,
                                 height: 100,
                                 child: FadeInImage(
@@ -1245,6 +1269,28 @@ String getHexColorFromMap(Map<String, String> color) {
   });
 
   return hexColor;
+}
+
+Widget getIconFavorite(
+    String idProduct, List<Favorite> favorite, Product product) {
+  bool check = false;
+  for (var element in favorite) {
+    if (element.idProduct == idProduct) {
+      check = true;
+    }
+  }
+
+  if (check == false) {
+    return const Icon(
+      Icons.favorite_border_outlined,
+      color: Color(0xff81221e),
+    );
+  } else {
+    return const Icon(
+      Icons.favorite,
+      color: Color(0xff81221e),
+    );
+  }
 }
 
 var bottomNavigationItems = <BottomNavigationBarItem>[

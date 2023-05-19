@@ -12,6 +12,7 @@ Widget searchField(BuildContext context) {
         decoration: BoxDecoration(
             border: Border.all(color: Colors.grey,width: 1),
             borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.03),
@@ -21,20 +22,25 @@ Widget searchField(BuildContext context) {
               ),
             ]),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(width: 5,),
+            Container(
+              margin: const EdgeInsets.only(left: 10),
+              child:const Text('Search . . .' , style: TextStyle(
+                color: Colors.grey,
+              ),),
+            ),
+            //const SizedBox(width: 5,),
             Container(
               width: 30,
               height: 30,
+              margin: const EdgeInsets.only(right: 5),
               decoration: BoxDecoration(
                 color: const Color(0xff80221e),
                 borderRadius: BorderRadius.circular(15),
                 // shape: BoxShape.circle
               ),
               child: const Center(child: Icon(Icons.search_rounded)),
-            ),
-            const SizedBox(
-              width: 15,
             ),
           ],
         ),
