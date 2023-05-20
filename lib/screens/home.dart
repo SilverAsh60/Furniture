@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:furniture_app_project/provider/user_provider.dart';
 import 'package:furniture_app_project/screens/setting.dart';
-import 'package:furniture_app_project/screens/test.dart';
 import '../models/cart_model.dart';
 import '../provider/banner_provider.dart';
 import '../provider/category_provider.dart';
@@ -707,9 +706,9 @@ class _HomePageState extends State<HomePage> {
                                     price: element.currentPrice,
                                   );
 
-                                  handler.insertFavorite(favorite);
-
-                                  Navigator.pop(context);
+                                  handler.insertFavorite(favorite).then((value) {
+                                    Navigator.pop(context);
+                                  });
                                 },
                               ),
                             ],
@@ -963,7 +962,9 @@ class _HomePageState extends State<HomePage> {
                                     idProduct: element.id,
                                     price: element.currentPrice,
                                   );
-                                  handler.insertFavorite(favorite);
+                                  handler.insertFavorite(favorite).then((value) {
+                                    Navigator.pop(context);
+                                  });
                                 },
                               ),
                             ],
@@ -1250,7 +1251,9 @@ class _HomePageState extends State<HomePage> {
                                     idProduct: element.id,
                                     price: element.currentPrice,
                                   );
-                                  handler.insertFavorite(favorite);
+                                  handler.insertFavorite(favorite).then((value) {
+                                    Navigator.pop(context);
+                                  });
                                 },
                               ),
                             ],
@@ -1504,7 +1507,9 @@ class _HomePageState extends State<HomePage> {
                                       price: element.currentPrice,
                                     );
 
-                                    handler.insertFavorite(favorite);
+                                    handler.insertFavorite(favorite).then((value) {
+                                      Navigator.pop(context);
+                                    });
                                   });
                                 },
                               ),

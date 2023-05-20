@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:furniture_app_project/screens/login.dart';
+import 'package:furniture_app_project/screens/order.dart';
 import 'package:furniture_app_project/screens/test.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
@@ -123,6 +124,9 @@ class _SettingPageState extends State<SettingPage> {
         }
         else if(text == "Cart") {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const CartPage()));
+        }
+        else if(text == "Order") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderPage()));
         }
         else if(text == "Log out") {
 

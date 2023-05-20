@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:furniture_app_project/models/order_model.dart';
 import '../models/product_model.dart';
 import 'package:flutter/material.dart';
 
@@ -443,6 +444,11 @@ class ProductProvider with ChangeNotifier {
 
     listProductByName = newList;
     notifyListeners();
+  }
+
+
+  Future<void> addReview(Review review , String idProduct) async {
+    await FirebaseFirestore.instance.collection('product').doc(idProduct).collection('review').doc(review.id).set(review.toMap());
   }
 
   List<Product> get getListProduct {

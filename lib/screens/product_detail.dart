@@ -83,6 +83,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   @override
   Widget build(BuildContext context) {
     userProvider = Provider.of<UserProvider>(context);
+
     if (number == 0) {
       setState(() {
         productItem = widget.productID.productItemList[0];
@@ -96,6 +97,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     });
 
     bool showCartBadge = cartBadgeAmount > 0;
+    userProvider.getListUser(widget.productID.reviewList);
     listUser = userProvider.getListUserSQ;
 
     return WillPopScope(

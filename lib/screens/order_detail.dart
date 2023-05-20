@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:furniture_app_project/models/order_model.dart';
 import 'package:barcode/barcode.dart';
 import 'package:furniture_app_project/screens/order.dart';
+import 'package:furniture_app_project/screens/review_product.dart';
 import 'package:intl/intl.dart';
 
 class OrderDetailPage extends StatefulWidget {
@@ -638,7 +639,19 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
         ),
       ),
-      bottomNavigationBar: widget.order.statusOrder == 'CHECKING' ? Container(
+      bottomNavigationBar: getFoo(),
+    );
+  }
+
+  String getDate(DateTime date) {
+    DateFormat dateFormat = DateFormat("dd/MM/yyyy  hh:MM:ss");
+    return dateFormat.format(date);
+  }
+
+  Widget getFoo() {
+
+    if(widget.order.statusOrder == 'CHECKING') {
+      return Container(
         margin: const EdgeInsets.all(10),
         child:
         GestureDetector(
@@ -682,14 +695,37 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),),
           ),
         ),
-      ) : Container(),
-    );
+      );
+    }
+    else if(widget.order.statusOrder == 'COMPLETE') {
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child:
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewPage(orderModel: widget.order)));
+          },
+          child:  Container(
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width / 1.5,
+            height: 60,
+            decoration: const BoxDecoration(
+              color: Color(0xffb23a48),
+              borderRadius:  BorderRadius.all(Radius.circular(20)),
+            ),
+            child: const Text('Review' , style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),),
+          ),
+        ),
+      );
+    }
+    else {
+      return Container();
+    }
   }
 
-  String getDate(DateTime date) {
-    DateFormat dateFormat = DateFormat("dd/MM/yyyy  hh:MM:ss");
-    return dateFormat.format(date);
-  }
 }
 
 class CustomBill extends CustomPainter {

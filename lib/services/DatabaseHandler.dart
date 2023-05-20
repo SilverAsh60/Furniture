@@ -1,5 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+
 import 'package:furniture_app_project/models/history_search_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -126,11 +125,13 @@ class DatabaseHandler {
   }
   Future<void> deleteCart(int idCart) async {
     final db = await initializeDB();
-    await db.delete(
+    await db.transaction((txn) async {
+      await txn.delete(
       'Cart',
       where: "idCart = ?",
       whereArgs: [idCart],
-    );
+      );
+    });
   }
   Future<void> updateCart(int idCart, int quantity) async {
     final db = await initializeDB();

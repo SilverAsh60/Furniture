@@ -1,4 +1,6 @@
 import 'package:furniture_app_project/provider/filter_provider.dart';
+import 'package:furniture_app_project/screens/home.dart';
+import 'package:furniture_app_project/screens/review_product.dart';
 import 'package:furniture_app_project/screens/welcome.dart';
 
 import 'provider/banner_provider.dart';

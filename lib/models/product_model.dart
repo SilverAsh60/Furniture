@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class Product extends Equatable {
@@ -82,7 +83,7 @@ class Review extends Equatable {
   final Map<String,dynamic> service;
   final double star;
 
-  const Review({
+  Review({
     required this.id,
     required this.idUser,
     required this.idOrder,
@@ -92,6 +93,13 @@ class Review extends Equatable {
     required this.service,
     required this.star,
   });
+
+  Timestamp myTimeStamp = Timestamp.fromDate(DateTime.now());
+
+  Map<String, Object?> toMap() {
+    return {'idUser':idUser,'idOrder': idOrder, 'message':message,'img': img,
+      'timestamp':myTimeStamp , 'service': {}, 'star': star};
+  }
 
   @override
   List<Object?> get props => [idOrder, idUser, id, message, img, date,service,star];

@@ -1,8 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:furniture_app_project/models/cart_model.dart';
 import 'package:furniture_app_project/provider/order_provider.dart';
 import 'package:furniture_app_project/provider/user_provider.dart';
 import 'package:furniture_app_project/screens/cart.dart';
@@ -10,7 +8,6 @@ import 'package:furniture_app_project/screens/favorite.dart';
 import 'package:furniture_app_project/screens/order_detail.dart';
 import 'package:furniture_app_project/widgets/bottom_navy_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/order_model.dart';
 
@@ -181,7 +178,7 @@ class _OrderPageState extends State<OrderPage> {
                       Container(
                         width: MediaQuery.of(context).size.width / 1.6,
                         alignment: Alignment.bottomRight,
-                        child: Text("CHECKING" , textAlign: TextAlign.end,style: TextStyle(
+                        child: Text(e.statusOrder , textAlign: TextAlign.end,style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.red[700],
